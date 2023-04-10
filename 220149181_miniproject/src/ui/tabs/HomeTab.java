@@ -29,6 +29,7 @@ public class HomeTab extends Tab {
 
 	public HomeTab() {
 		setText("Home");
+		setClosable(false);
 		// creating label for adding content to tabs
 		Label crimeIncidentLabel = new Label("Add Civilian Incident");
 		Label securityCompanyLabel = new Label("Add Security Company");

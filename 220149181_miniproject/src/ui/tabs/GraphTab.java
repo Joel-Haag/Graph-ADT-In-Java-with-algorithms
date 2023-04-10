@@ -17,6 +17,7 @@ public class GraphTab extends Tab {
 	private String pathToReadCommunityPolice = "./data/CommunityPolice.binary";
 public GraphTab() {
 	setText("Graph");
+	setClosable(false);
 	//creating the graph
 //	Graph<Civilian> graph = new Graph<Civilian>();
 //	// getting list of objects from civilian file

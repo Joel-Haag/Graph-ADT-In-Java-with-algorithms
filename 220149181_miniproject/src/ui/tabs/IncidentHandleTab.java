@@ -5,16 +5,21 @@ import java.util.List;
 import java.util.UUID;
 
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import nodes.Civilian;
 import nodes.CommunityPolice;
+import nodes.Incident;
 import nodes.SecurityCompany;
 import ui.helper.HelperFunctions;
 
@@ -28,6 +33,7 @@ public class IncidentHandleTab extends Tab {
 	private CommunityPolice communityPolice = null;
 
 	public IncidentHandleTab() {
+		setClosable(false);
 		setText("Handle Incidents");
 
 		VBox IncidentHandleContentVbox = new VBox();
@@ -77,7 +83,6 @@ public class IncidentHandleTab extends Tab {
 		civilianComboBox.valueProperty().addListener((observable, oldCiv, newCiv) -> {
 			if (newCiv != null) {
 				civilian = newCiv;
-				System.out.println("Selected item: " + newCiv.getId());
 			}
 		});
 
@@ -115,7 +120,6 @@ public class IncidentHandleTab extends Tab {
 		securityCompComboBox.valueProperty().addListener((observable, oldSec, newSec) -> {
 			if (newSec != null) {
 				securityCompany = newSec;
-				System.out.println("Selected item: " + newSec.getName());
 			}
 		});
 
@@ -152,14 +156,74 @@ public class IncidentHandleTab extends Tab {
 		comPopoComboBox.valueProperty().addListener((observable, oldCom, newCom) -> {
 			if (newCom != null) {
 				communityPolice = newCom;
-				System.out.println("Selected item: " + newCom.getLocation());
 			}
 		});
 
 		comboBoxes.getChildren().addAll(civilianComboBox, securityCompComboBox, comPopoComboBox);
 		comboBoxes.setSpacing(10);
 
-		IncidentHandleContentVbox.getChildren().addAll(IncidentHandleHeadingLabel, InfoLabel, comboBoxes);
+		// Labels and text areas to fill in details about the incident
+		Label severityLabel = new Label("Severity: (1-10)");
+		severityLabel.setFont(Font.font("System", FontWeight.BOLD, 15));
+		TextField severityTextField = new TextField();
+		HBox severityHBox = new HBox(severityLabel, severityTextField);
+		severityHBox.setSpacing(10);
+
+		Label descriptionLabel = new Label("Description:");
+		descriptionLabel.setFont(Font.font("System", FontWeight.BOLD, 15));
+		TextArea descriptionTextField = new TextArea();
+		descriptionTextField.setPrefSize(300, 100);
+		HBox descriptionHBox = new HBox(descriptionLabel, descriptionTextField);
+		descriptionHBox.setSpacing(35);
+
+		Button submitIncidentButton = new Button("Submit");
+
+		submitIncidentButton.setOnAction(e -> {
+			Incident newIncident = new Incident();
+			if (civilian != null)
+				newIncident.setCivilian(civilian);
+			else {
+				Alert alert = new Alert(Alert.AlertType.WARNING, "You need to choose a civilian for an incident");
+				alert.setTitle("Civilian required");
+				alert.setHeaderText("No Civilian");
+				alert.showAndWait();
+			}
+			if (communityPolice == null && securityCompany == null) {
+			    Alert alert = new Alert(Alert.AlertType.WARNING, "You need either a security guard or a community police for an incident");
+			    alert.setTitle("Security or community police required");
+			    alert.setHeaderText("No security or community police");
+			    alert.showAndWait();
+			}
+			if (securityCompany != null)
+				newIncident.setSecurityCompany(securityCompany);
+			if (communityPolice != null)
+				newIncident.setCommunityPolice(communityPolice);
+			if (severityTextField.getText() != "")
+				newIncident.setSeverity(Integer.parseInt(severityTextField.getText()));
+			else {
+				Alert alert = new Alert(Alert.AlertType.WARNING, "You need to add severity of crime");
+				alert.setTitle("Severity required");
+				alert.setHeaderText("No Severity");
+				alert.showAndWait();
+			}
+			if (descriptionTextField.getText() != "")
+				newIncident.setDescription(descriptionTextField.getText());
+			else {
+				Alert alert = new Alert(Alert.AlertType.WARNING, "You need to add a description");
+				alert.setTitle("Description required");
+				alert.setHeaderText("No Description");
+				alert.showAndWait();
+			}
+			if(civilian != null && severityTextField.getText() != "" && descriptionTextField.getText() != "")
+			{
+				if(communityPolice != null || securityCompany != null)
+					System.out.println("Nice");
+			}
+
+		});
+
+		IncidentHandleContentVbox.getChildren().addAll(IncidentHandleHeadingLabel, InfoLabel, comboBoxes, severityHBox,
+				descriptionHBox, submitIncidentButton);
 		setContent(IncidentHandleContentVbox);
 	}
 }

@@ -27,6 +27,7 @@ public class DataTab extends Tab {
 
 	public DataTab() {
 		setText("Data");
+		setClosable(false);
 		// label informing them to choose which data they want to view
 		Label choiceLabel = new Label("Choose which data you want to view");
 		choiceLabel.setFont(Font.font("System", FontWeight.BOLD, 16));

@@ -20,8 +20,8 @@ public class Incident {
 		this.communityPolice = communityPolice;
 	}
 
-	public void setDistance(Double distance) {
-		this.distance = distance;
+	public void setDistance(String civilianDistance, String securityCompanyDistance) {
+		this.distance = 2.0;
 	}
 
 	public void setSeverity(Integer severity) {
