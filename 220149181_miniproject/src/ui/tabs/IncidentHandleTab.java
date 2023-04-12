@@ -27,10 +27,12 @@ public class IncidentHandleTab extends Tab {
 	private String pathToReadCivilian = "./data/Civilians.binary";
 	private String pathToReadSecurityCompany = "./data/SecurityCompany.binary";
 	private String pathToReadCommunityPolice = "./data/CommunityPolice.binary";
+	private String pathToSaveIncident = "./data/Incident.binary";
 
 	private Civilian civilian = null;
 	private SecurityCompany securityCompany = null;
 	private CommunityPolice communityPolice = null;
+	private Boolean addedCorrectely = false;
 
 	public IncidentHandleTab() {
 		setClosable(false);
@@ -45,6 +47,7 @@ public class IncidentHandleTab extends Tab {
 
 		IncidentHandleContentVbox.setAlignment(Pos.TOP_CENTER);
 		IncidentHandleContentVbox.setSpacing(30);
+		Label savedIncidentCorrectlyLabel = new Label("");
 		// FIRST GETTING ALL PARTIES INVOLVED BY USING COMBO BOXES WHICH USER CAN SELECT
 		// FROM
 		// Horizontal box to store all the select combo boxes
@@ -189,10 +192,11 @@ public class IncidentHandleTab extends Tab {
 				alert.showAndWait();
 			}
 			if (communityPolice == null && securityCompany == null) {
-			    Alert alert = new Alert(Alert.AlertType.WARNING, "You need either a security guard or a community police for an incident");
-			    alert.setTitle("Security or community police required");
-			    alert.setHeaderText("No security or community police");
-			    alert.showAndWait();
+				Alert alert = new Alert(Alert.AlertType.WARNING,
+						"You need either a security guard or a community police for an incident");
+				alert.setTitle("Security or community police required");
+				alert.setHeaderText("No security or community police");
+				alert.showAndWait();
 			}
 			if (securityCompany != null)
 				newIncident.setSecurityCompany(securityCompany);
@@ -214,16 +218,20 @@ public class IncidentHandleTab extends Tab {
 				alert.setHeaderText("No Description");
 				alert.showAndWait();
 			}
-			if(civilian != null && severityTextField.getText() != "" && descriptionTextField.getText() != "")
-			{
-				if(communityPolice != null || securityCompany != null)
-					System.out.println("Nice");
+			if (civilian != null && severityTextField.getText() != "" && descriptionTextField.getText() != "") {
+				if (communityPolice != null || securityCompany != null)
+					addedCorrectely = HelperFunctions.appendClassToFile(pathToSaveIncident, newIncident);
+				if (addedCorrectely) {
+					savedIncidentCorrectlyLabel.setText("Succesfully saved a a new incident");
+				} else {
+					savedIncidentCorrectlyLabel.setText("Couldn't save new incident");
+				}
 			}
 
 		});
 
 		IncidentHandleContentVbox.getChildren().addAll(IncidentHandleHeadingLabel, InfoLabel, comboBoxes, severityHBox,
-				descriptionHBox, submitIncidentButton);
+				descriptionHBox, savedIncidentCorrectlyLabel, submitIncidentButton);
 		setContent(IncidentHandleContentVbox);
 	}
 }

@@ -3,7 +3,7 @@ package nodes;
 import java.io.Serializable;
 import java.util.UUID;
 
-public class Civilian implements Serializable, Comparable<Civilian> {
+public class Civilian  implements Individual, Serializable {
 
 	/**
 	 * 
@@ -12,14 +12,16 @@ public class Civilian implements Serializable, Comparable<Civilian> {
 	private UUID id;
 	private String name;
 	private String gender;
-	private String homeStreetName;
+	private String location;
 	private int age;
 
-	public Civilian(String name, String gender, String streetName, int age) {
+
+	public Civilian(String name, String gender,  String location, int age) {
+		this.id = UUID.randomUUID();
 		this.id = UUID.randomUUID();
 		this.name = name;
 		this.gender = gender;
-		this.homeStreetName = streetName;
+		this.location = location;
 		this.age = age;
 	}
 
@@ -31,27 +33,32 @@ public class Civilian implements Serializable, Comparable<Civilian> {
 		return gender;
 	}
 
-	public String getStreetName() {
-		return homeStreetName;
-	}
 
 
 	public int getAge() {
 		return age;
 	}
 
-	public UUID getId() {
-		return this.id;
-	}
 	
     @Override
     public String toString() {
-        return name;
+        return location;
     }
 
 
+
 	@Override
-	public int compareTo(Civilian o) {
+	public String getLocation() {
+		return location;
+	}
+
+	@Override
+	public UUID getId() {
+		return id;
+	}
+
+	@Override
+	public int compareTo(Individual o) {
 		// TODO Auto-generated method stub
 		return 0;
 	}

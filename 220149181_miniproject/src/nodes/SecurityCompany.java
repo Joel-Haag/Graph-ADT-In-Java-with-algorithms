@@ -3,7 +3,7 @@ package nodes;
 import java.io.Serializable;
 import java.util.UUID;
 
-public class SecurityCompany implements Serializable, Comparable<SecurityCompany> {
+public class SecurityCompany implements Individual, Serializable {
 	/**
 	 * 
 	 */
@@ -25,27 +25,30 @@ public class SecurityCompany implements Serializable, Comparable<SecurityCompany
 		return name;
 	}
 
-	public String getLocation() {
-		return location;
-	}
-
 	public Double getPrice() {
 		return price;
 	}
 
-	public UUID getId() {
-		return this.id;
+	@Override
+	public String getLocation() {
+		return location;
 	}
-	
-    @Override
-    public String toString() {
-        return name;
-    }
 
 	@Override
-	public int compareTo(SecurityCompany o) {
+	public UUID getId() {
+		return id;
+	}
+
+	@Override
+	public String toString() {
+		return location;
+	}
+
+	@Override
+	public int compareTo(Individual o) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+
 
 }

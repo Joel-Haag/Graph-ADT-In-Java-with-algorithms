@@ -8,6 +8,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import nodes.Civilian;
 
 public class HelperFunctions {
 
@@ -26,24 +30,21 @@ public class HelperFunctions {
 
 			// create a FileOutputStream with append mode set to true
 			FileOutputStream fos = null;
-			fos = new FileOutputStream(
-					pathToWrite, true);
-			
-			 if (f.length() == 0) {
-                 ObjectOutputStream oos
-                     = new ObjectOutputStream(fos);
-                 oos.writeObject(objectToAdd);
-                 oos.close();
-             }
-			    else {
-			    	 
-                    MyObjectOutputStream oos = null;
-                    oos = new MyObjectOutputStream(fos);
-                    oos.writeObject(objectToAdd);
- 
-                    oos.close();
-                }
-			 fos.close();
+			fos = new FileOutputStream(pathToWrite, true);
+
+			if (f.length() == 0) {
+				ObjectOutputStream oos = new ObjectOutputStream(fos);
+				oos.writeObject(objectToAdd);
+				oos.close();
+			} else {
+
+				MyObjectOutputStream oos = null;
+				oos = new MyObjectOutputStream(fos);
+				oos.writeObject(objectToAdd);
+
+				oos.close();
+			}
+			fos.close();
 
 			return true;
 		} // Catch block to handle the exceptions
@@ -89,4 +90,31 @@ public class HelperFunctions {
 		}
 		return objects;
 	}
+	
+	public static Integer[] extractCoords(String input) {
+	    // Define a regular expression that matches two doubles separated by a colon
+	    String regex = "(\\d+(\\.\\d+)?):(\\d+(\\.\\d+)?)";
+
+	    // Create a pattern object from the regular expression
+	    Pattern pattern = Pattern.compile(regex);
+
+	    // Create a matcher object to search for the pattern in the input string
+	    Matcher matcher = pattern.matcher(input);
+
+	    // If a match is found, extract the two doubles and return them as a double array
+	    if (matcher.find()) {
+	        try {
+	            int firstDouble = Integer.parseInt(matcher.group(1));
+	            int secondDouble = Integer.parseInt(matcher.group(3));
+	            return new Integer[]{firstDouble, secondDouble};
+	        } catch (NumberFormatException e) {
+	            System.err.println("Error: Unable to parse double from input string.");
+	            return new Integer[]{Integer.BYTES, Integer.BYTES};
+	        }
+	    } else {
+	        System.err.println("Error: Input string does not match expected format.");
+	        return new Integer[]{Integer.BYTES, Integer.BYTES};
+	    }
+	}
+
 }

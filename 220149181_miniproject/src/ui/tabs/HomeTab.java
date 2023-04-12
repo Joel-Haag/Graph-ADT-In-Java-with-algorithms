@@ -80,7 +80,7 @@ public class HomeTab extends Tab {
 			genderBox.setSpacing(10);
 
 			// adding streetName label and text field to a new hbox
-			Label streetNameLabel = new Label("Street Name:");
+			Label streetNameLabel = new Label("Location: (x:y)");
 			TextField streetNameTextField = new TextField();
 			HBox streetNameBox = new HBox(streetNameLabel, streetNameTextField);
 			streetNameBox.setAlignment(Pos.CENTER_LEFT);
@@ -116,6 +116,7 @@ public class HomeTab extends Tab {
 				// adding civilian to file
 				addedCorrectely = HelperFunctions.appendClassToFile(pathToSaveCivilian, newCivilian);
 				if (addedCorrectely) {
+					System.out.println(newCivilian.getLocation() + " " + newCivilian.getName());
 					addedCivilianCorrectlyLabel.setText("Succesfully saved a civilian incident");
 				} else {
 					addedCivilianCorrectlyLabel.setText("Couldn't save civilian incident");
@@ -143,7 +144,7 @@ public class HomeTab extends Tab {
 			nameBox.setSpacing(50);
 
 			// adding location of crime label and text field to a new hbox
-			Label locationOfCrimeLabel = new Label("Location:");
+			Label locationOfCrimeLabel = new Label("Location: (x:y)");
 			TextField locationOfCrimeTextField = new TextField();
 			HBox locationOfCrimeBox = new HBox(locationOfCrimeLabel, locationOfCrimeTextField);
 			locationOfCrimeBox.setAlignment(Pos.CENTER_LEFT);
@@ -198,7 +199,7 @@ public class HomeTab extends Tab {
 			addCommunityPoliceModal.initModality(Modality.APPLICATION_MODAL);
 
 			// adding location of crime label and text field to a new hbox
-			Label locationOfCrimeLabel = new Label("Location:");
+			Label locationOfCrimeLabel = new Label("Location: (x:y)");
 			TextField locationOfCrimeTextField = new TextField();
 			HBox locationOfCrimeBox = new HBox(locationOfCrimeLabel, locationOfCrimeTextField);
 			locationOfCrimeBox.setAlignment(Pos.CENTER_LEFT);

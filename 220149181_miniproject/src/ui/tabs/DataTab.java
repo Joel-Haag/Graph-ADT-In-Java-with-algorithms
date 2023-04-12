@@ -75,7 +75,7 @@ public class DataTab extends Tab {
 				Label civStreetName = new Label();
 				civName.setText("Name: " + civ.getName());
 				civGender.setText("Gender: " + civ.getGender());
-				civStreetName.setText("Street: " + civ.getStreetName());
+				civStreetName.setText("Location: " + civ.getLocation());
 				VBox oneCivData = new VBox(civName, civGender, civStreetName);
 				oneCivData.setStyle(cssLayout);
 				civilianModalContent.getChildren().add(oneCivData);
@@ -97,7 +97,7 @@ public class DataTab extends Tab {
 		// Handling viewSecurityCompanyButton button click
 		viewSecurityCompnayButton.setOnAction(e -> {
 			// Getting the civilian data from the civilian text file and adding each one to
-			// getting list of objects from civilian file
+			// getting list of objects from security file
 			List<Object> objects = HelperFunctions.readClassesFromFile(pathToReadSecurityCompany);
 			List<SecurityCompany> securityCompanies = new ArrayList<>();
 

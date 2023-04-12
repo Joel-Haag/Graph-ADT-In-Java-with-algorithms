@@ -1,6 +1,8 @@
 package nodes;
 
-public class Incident {
+import java.io.Serializable;
+
+public class Incident implements Serializable, Comparable<Incident> {
 	private Civilian civilian;
 	private SecurityCompany securityCompany;
 	private CommunityPolice communityPolice;
@@ -54,6 +56,12 @@ public class Incident {
 
 	public String getDescription() {
 		return description;
+	}
+
+	@Override
+	public int compareTo(Incident o) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }
