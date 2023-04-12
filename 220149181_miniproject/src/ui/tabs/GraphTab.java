@@ -50,8 +50,8 @@ public class GraphTab extends Tab {
 		// getting list of objects from civilian file
 		List<Object> civilianObjects = HelperFunctions.readClassesFromFile(pathToReadCivilian);
 		List<Civilian> civilians = new ArrayList<>();
-		
-		//Button which creates and shows graph
+
+		// Button which creates and shows graph
 		Pane pane = new Pane();
 		pane.setStyle("-fx-background-color: black;");
 		Stage graphStage = new Stage();
@@ -127,6 +127,7 @@ public class GraphTab extends Tab {
 			List<Incident> incidents = new ArrayList<>();
 			Integer[] civilianCoords = null;
 			Integer[] responderCoords = null;
+			Boolean foundEdge = false;
 			// adding community police as vertices to graph
 			for (Object incidentObj : incidentObjects) {
 				Vertex<Individual> v1 = null;
@@ -134,7 +135,6 @@ public class GraphTab extends Tab {
 
 				if (incidentObj instanceof Incident) {
 					incidents.add((Incident) incidentObj);
-					System.out.println("printing: " + incidentObj);
 					if (((Incident) incidentObj).getSecurityCompany() != null) {
 						if (((Incident) incidentObj).getCivilian() != null) {
 							List<Vertex<Individual>> theVertices = graph.getVertices();
@@ -151,8 +151,8 @@ public class GraphTab extends Tab {
 											.extractCoords(((Incident) incidentObj).getSecurityCompany().getLocation());
 								}
 							}
-							Edge<Individual> incidentEdge = new Edge<Individual>(((Incident) incidentObj).getSeverity(), v1,
-									v2);
+							Edge<Individual> incidentEdge = new Edge<Individual>(((Incident) incidentObj).getSeverity(),
+									v1, v2);
 							Line line = new Line();
 							// Set the line's color and width:
 							line.setStroke(Color.WHITE);
@@ -183,20 +183,30 @@ public class GraphTab extends Tab {
 							}
 						}
 					}
-
-					// Edge<Incident> incidentEdge = new Edge<Incident>(((Incident)
-					// incidentObj).getSeverity(), v1, v2);
+					if (v1 != null && v2 != null) {
+						System.out.println(v2.compareTo(v1));
+//						System.out.println("ADDING EDGE");
+//						System.out.println("v1 : " + v1);
+//						System.out.println("v2 : " +v2);
+						Edge<Individual> incidentEdge = new Edge<Individual>(((Incident) incidentObj).getSeverity(), v1,
+								v2);
+						graph.getEdges().add(incidentEdge);
+						v1 = null;
+						v2 = null;
+					}
 
 				}
 
 			}
+		//	System.out.println(graph.getEdges());
+			System.out.println(graph);
+			System.out.println(graph.getEdges());
+			System.out.println(graph.getVertices());
 			graphStage.showAndWait();
+
 		});
 
-
-
 		VBox graphContentVBox = new VBox();
-
 
 		graphContentVBox.getChildren().addAll(showGraph);
 
