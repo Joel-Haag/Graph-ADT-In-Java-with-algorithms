@@ -13,6 +13,7 @@ import javafx.geometry.Point2D;
 import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -66,13 +67,21 @@ public class GraphTab extends Tab {
 			for (Object civObj : civilianObjects) {
 				if (civObj instanceof Civilian) {
 					civilians.add((Civilian) civObj);
+					System.out.println(((Civilian) civObj).getName());
+					System.out.println(((Civilian) civObj).getLocation());
 					graph.getVertices().add(new Vertex<Individual>((Civilian) civObj, 1));
 					Integer[] coords = HelperFunctions.extractCoords(((Civilian) civObj).getLocation());
+					System.out.println(coords[0]);
+					System.out.println(coords[1]);
 
 					Circle circle = new Circle(10, Color.BLUE);
+					Label civNameLabel = new Label(((Civilian) civObj).getName());
+					civNameLabel.setTextFill(Color.DARKOLIVEGREEN);
 					circle.setCenterX(coords[0] * 50);
 					circle.setCenterY(coords[1] * 50);
-					pane.getChildren().add(circle);
+					civNameLabel.setLayoutX(circle.getCenterX() - circle.getRadius());
+					civNameLabel.setLayoutY(circle.getCenterY() - circle.getRadius() * 2.5);
+					pane.getChildren().addAll(circle, civNameLabel);
 					circleArray[row] = circle;
 					uuidArray[row] = ((Civilian) civObj).getId();
 					row += 1;
@@ -91,9 +100,13 @@ public class GraphTab extends Tab {
 					graph.getVertices().add(new Vertex<Individual>((SecurityCompany) secObj, 2));
 					Integer[] coords = HelperFunctions.extractCoords(((SecurityCompany) secObj).getLocation());
 					Circle circle = new Circle(10, Color.RED);
+					Label secNameLabel = new Label(((SecurityCompany) secObj).getName());
+					secNameLabel.setTextFill(Color.DARKOLIVEGREEN);
 					circle.setCenterX(coords[0] * 50);
 					circle.setCenterY(coords[1] * 50);
-					pane.getChildren().add(circle);
+					secNameLabel.setLayoutX(circle.getCenterX() - circle.getRadius());
+					secNameLabel.setLayoutY(circle.getCenterY() - circle.getRadius() * 2.5);
+					pane.getChildren().addAll(circle, secNameLabel);
 					circleArray[row] = circle;
 					uuidArray[row] = ((SecurityCompany) secObj).getId();
 					row += 1;
@@ -112,9 +125,13 @@ public class GraphTab extends Tab {
 					graph.getVertices().add(new Vertex<Individual>((CommunityPolice) comPopoObj, 3));
 					Integer[] coords = HelperFunctions.extractCoords(((CommunityPolice) comPopoObj).getLocation());
 					Circle circle = new Circle(10, Color.ORANGE);
+					Label commLabel = new Label("COMMUNITY POLICE");
+					commLabel.setTextFill(Color.DARKOLIVEGREEN);
 					circle.setCenterX(coords[0] * 50);
 					circle.setCenterY(coords[1] * 50);
-					pane.getChildren().add(circle);
+					commLabel.setLayoutX(circle.getCenterX() - circle.getRadius());
+					commLabel.setLayoutY(circle.getCenterY() - circle.getRadius() * 2.5);
+					pane.getChildren().addAll(circle, commLabel);
 					circleArray[row] = circle;
 					uuidArray[row] = ((CommunityPolice) comPopoObj).getId();
 					row += 1;
@@ -198,7 +215,7 @@ public class GraphTab extends Tab {
 				}
 
 			}
-		//	System.out.println(graph.getEdges());
+			// System.out.println(graph.getEdges());
 			System.out.println(graph);
 			System.out.println(graph.getEdges());
 			System.out.println(graph.getVertices());
