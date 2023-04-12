@@ -185,7 +185,7 @@ public class GraphTab extends Tab {
 					}
 
 					// Edge<Incident> incidentEdge = new Edge<Incident>(((Incident)
-					// incidentObj).getSeverity(), null, null);
+					// incidentObj).getSeverity(), v1, v2);
 
 				}
 
