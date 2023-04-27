@@ -84,7 +84,7 @@ public class HomeTab extends Tab {
 			TextField streetNameTextField = new TextField();
 			HBox streetNameBox = new HBox(streetNameLabel, streetNameTextField);
 			streetNameBox.setAlignment(Pos.CENTER_LEFT);
-			streetNameBox.setSpacing(15);
+			streetNameBox.setSpacing(12);
 
 			// adding age label and text field to a new hbox
 			Label ageLabel = new Label("Age:");
@@ -148,7 +148,7 @@ public class HomeTab extends Tab {
 			TextField locationOfCrimeTextField = new TextField();
 			HBox locationOfCrimeBox = new HBox(locationOfCrimeLabel, locationOfCrimeTextField);
 			locationOfCrimeBox.setAlignment(Pos.CENTER_LEFT);
-			locationOfCrimeBox.setSpacing(37);
+			locationOfCrimeBox.setSpacing(12);
 
 			// adding age label and text field to a new hbox
 			Label priceLabel = new Label("Price:");
@@ -203,7 +203,7 @@ public class HomeTab extends Tab {
 			TextField locationOfCrimeTextField = new TextField();
 			HBox locationOfCrimeBox = new HBox(locationOfCrimeLabel, locationOfCrimeTextField);
 			locationOfCrimeBox.setAlignment(Pos.CENTER_LEFT);
-			locationOfCrimeBox.setSpacing(50);
+			locationOfCrimeBox.setSpacing(23);
 
 			// adding number of members label and text field to a new hbox
 			Label numberOfMembersLabel = new Label("Memebers no:");

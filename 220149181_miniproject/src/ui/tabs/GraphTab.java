@@ -9,7 +9,9 @@ import com.jwetherell.algorithms.data_structures.Graph.Edge;
 import com.jwetherell.algorithms.data_structures.Graph.Vertex;
 
 import javafx.geometry.HPos;
+import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
+import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -50,14 +52,23 @@ public class GraphTab extends Tab {
 	public GraphTab() {
 		setText("Graph");
 		setClosable(false);
-		GraphButton showGraph = new GraphButton("Show Graph");
-		showGraph.setOnAction(e -> showGraph.doSomething()); // add an action to the button
+		VBox graphTabContentVbox = new VBox();
+		Label showInitialGraphLabel = new Label("View Graph made from inputed data");
+		GraphButton showGraphButton = new GraphButton("View");
+		
+		
+		Label showRecommendedGraphLabel = new Label("View Reccomended graph to organise data");
+		
+		graphTabContentVbox.getChildren().addAll(showInitialGraphLabel, showGraphButton, showRecommendedGraphLabel);
+		graphTabContentVbox.setAlignment(Pos.TOP_CENTER);
+		graphTabContentVbox.setSpacing(20);
+		graphTabContentVbox.setPadding( new Insets(20));
+		
+		showGraphButton.setOnAction(e -> showGraphButton.createGraph()); // add an action to the button
 
-		VBox graphContentVBox = new VBox();
 
-		graphContentVBox.getChildren().addAll(showGraph);
 
-		setContent(graphContentVBox);
+		setContent(graphTabContentVbox);
 
 	}
 

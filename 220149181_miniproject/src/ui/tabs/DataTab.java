@@ -10,6 +10,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -44,7 +45,7 @@ public class DataTab extends Tab {
 		viewCivilianButton.setOnAction(e -> {
 			// Getting the civilian data from the civilian text file and adding each one to
 			// getting list of objects from civilian file
-			List<Object> objects = HelperFunctions.readClassesFromFile(pathToReadCivilian);
+			List<Object> objects = HelperFunctions.readClassesFromFile(pathToReadCivilian, Civilian.class);
 			List<Civilian> civilians = new ArrayList<>();
 
 			// creating a modal where the civilian data will be displayed
@@ -70,23 +71,36 @@ public class DataTab extends Tab {
 					+ "-fx-border-style: solid;\n; -fx-border-width: 0 0 5 0;";
 
 			for (Civilian civ : civilians) {
+				Label civID = new Label();
 				Label civName = new Label();
 				Label civGender = new Label();
 				Label civStreetName = new Label();
+				civID.setText("ID: " + civ.getId());
 				civName.setText("Name: " + civ.getName());
 				civGender.setText("Gender: " + civ.getGender());
 				civStreetName.setText("Location: " + civ.getLocation());
-				VBox oneCivData = new VBox(civName, civGender, civStreetName);
+				Button removeCivData = new Button("Delete");
+				
+				removeCivData.setOnAction(event -> {
+					HelperFunctions.removeCivilianFromFile(pathToReadCivilian, civ.getId());
+				});
+				
+				
+				VBox oneCivData = new VBox(civID, civName, civGender, civStreetName);
 				oneCivData.setStyle(cssLayout);
-				civilianModalContent.getChildren().add(oneCivData);
+				HBox civDataAndButtons = new HBox(oneCivData, removeCivData);
+				civDataAndButtons.setSpacing(10);
+				civilianModalContent.getChildren().add(civDataAndButtons);
 			}
+			
+			
 
 			ScrollPane scroll = new ScrollPane();
 			scroll.setPrefSize(800, 800);
 			// Setting content to the scroll pane
 			scroll.setContent(civilianModalContent);
 			// add the vbox to the scene and set it as the content for the modal
-			Scene modalScene = new Scene(scroll, 300, 400);
+			Scene modalScene = new Scene(scroll, 400, 400);
 			CivilianModal.setScene(modalScene);
 
 			// show the modal
@@ -98,7 +112,7 @@ public class DataTab extends Tab {
 		viewSecurityCompnayButton.setOnAction(e -> {
 			// Getting the civilian data from the civilian text file and adding each one to
 			// getting list of objects from security file
-			List<Object> objects = HelperFunctions.readClassesFromFile(pathToReadSecurityCompany);
+			List<Object> objects = HelperFunctions.readClassesFromFile(pathToReadSecurityCompany, SecurityCompany.class);
 			List<SecurityCompany> securityCompanies = new ArrayList<>();
 
 			// creating a modal where the civilian data will be displayed
@@ -124,15 +138,24 @@ public class DataTab extends Tab {
 					+ "-fx-border-style: solid;\n; -fx-border-width: 0 0 5 0;";
 
 			for (SecurityCompany secComp : securityCompanies) {
+				Label secIDLabel = new Label();
 				Label secNameLabel = new Label();
 				Label secLocationLabel = new Label();
 				Label secPriceLabel = new Label();
+				secIDLabel.setText("ID: " + secComp.getId());
 				secNameLabel.setText("Name: " + secComp.getName());
 				secLocationLabel.setText("Location: " + secComp.getLocation());
 				secPriceLabel.setText("Price: R" + secComp.getPrice());
-				VBox oneSecData = new VBox(secNameLabel, secLocationLabel, secPriceLabel);
+				Button removeSecData = new Button("Delete");
+				
+				removeSecData.setOnAction(event -> {
+					HelperFunctions.removeSecurityCompanyFromFile(pathToReadSecurityCompany, secComp.getId());
+				});
+				VBox oneSecData = new VBox(secIDLabel, secNameLabel, secLocationLabel, secPriceLabel);
 				oneSecData.setStyle(cssLayout);
-				securityCompanyModalContent.getChildren().add(oneSecData);
+				HBox civDataAndButtons = new HBox(oneSecData, removeSecData);
+				civDataAndButtons.setSpacing(10);
+				securityCompanyModalContent.getChildren().add(civDataAndButtons);
 			}
 
 			ScrollPane scroll = new ScrollPane();
@@ -152,7 +175,7 @@ public class DataTab extends Tab {
 		viewCommunityPoliceButton.setOnAction(e -> {
 			// Getting the community police data from the community police text file and adding each one to
 			// getting list of objects from community police file
-			List<Object> objects = HelperFunctions.readClassesFromFile(pathToReadCommunityPolice);
+			List<Object> objects = HelperFunctions.readClassesFromFile(pathToReadCommunityPolice, CommunityPolice.class);
 			List<CommunityPolice> communityPolicies = new ArrayList<>();
 
 			// creating a modal where the civilian data will be displayed
@@ -187,7 +210,13 @@ public class DataTab extends Tab {
 				VBox oneComPopoData = new VBox(secLocationLabel, secNumberOfMemebersLabel,
 						secNumberOfAvailableSpaceLabel);
 				oneComPopoData.setStyle(cssLayout);
-				communityPoliceModalContent.getChildren().add(oneComPopoData);
+				Button removeCommunityPoliceButton = new Button("Delete");
+				
+				removeCommunityPoliceButton.setOnAction(event -> {
+					HelperFunctions.removeSecurityCompanyFromFile(pathToReadCommunityPolice, comPopo.getId());
+				});
+				HBox civDataAndButtons = new HBox(oneComPopoData, removeCommunityPoliceButton);
+				communityPoliceModalContent.getChildren().add(civDataAndButtons);
 			}
 
 			ScrollPane scroll = new ScrollPane();

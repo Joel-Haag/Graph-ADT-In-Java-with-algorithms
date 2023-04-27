@@ -54,7 +54,7 @@ public class IncidentHandleTab extends Tab {
 		HBox comboBoxes = new HBox();
 
 		// getting list of objects from civilian file
-		List<Object> civilianObjects = HelperFunctions.readClassesFromFile(pathToReadCivilian);
+		List<Object> civilianObjects = HelperFunctions.readClassesFromFile(pathToReadCivilian, Civilian.class);
 		List<Civilian> civilians = new ArrayList<>();
 
 		for (Object civObj : civilianObjects) {
@@ -91,7 +91,7 @@ public class IncidentHandleTab extends Tab {
 
 		// Getting the civilian data from the civilian text file and adding each one to
 		// getting list of objects from civilian file
-		List<Object> securityCompObjects = HelperFunctions.readClassesFromFile(pathToReadSecurityCompany);
+		List<Object> securityCompObjects = HelperFunctions.readClassesFromFile(pathToReadSecurityCompany, SecurityCompany.class);
 		List<SecurityCompany> securityCompanies = new ArrayList<>();
 
 		for (Object secCompObj : securityCompObjects) {
@@ -127,7 +127,7 @@ public class IncidentHandleTab extends Tab {
 		});
 
 		// getting list of objects from community police file
-		List<Object> comPopoObjects = HelperFunctions.readClassesFromFile(pathToReadCommunityPolice);
+		List<Object> comPopoObjects = HelperFunctions.readClassesFromFile(pathToReadCommunityPolice, CommunityPolice.class);
 		List<CommunityPolice> communityPolicies = new ArrayList<>();
 
 		for (Object comPopoObj : comPopoObjects) {

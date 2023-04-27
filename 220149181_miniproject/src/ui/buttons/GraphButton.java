@@ -1,6 +1,7 @@
 package ui.buttons;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,6 +26,7 @@ import nodes.Incident;
 import nodes.Individual;
 import nodes.SecurityCompany;
 import ui.helper.HelperFunctions;
+import nodes.algorithms.AlgorithmHelperFunctions;
 
 public class GraphButton extends Button {
 	private String pathToReadCivilian = "./data/Civilians.binary";
@@ -42,7 +44,8 @@ public class GraphButton extends Button {
 
 	}
 
-	public void doSomething() {
+	public void createGraph() {
+		setElementsToNothing();
 		row = 0;
 		// getting list of objects from civilian file
 		// Button which creates and shows graph
@@ -54,7 +57,7 @@ public class GraphButton extends Button {
 		graphStage.initModality(Modality.APPLICATION_MODAL);
 		graphStage.setWidth(800);
 		graphStage.setHeight(800);
-		List<Object> civilianObjects = HelperFunctions.readClassesFromFile(pathToReadCivilian);
+		List<Object> civilianObjects = HelperFunctions.readClassesFromFile(pathToReadCivilian, Civilian.class);
 		List<Civilian> civilians = new ArrayList<>();
 
 		Graph<Individual> graph = new Graph<Individual>();
@@ -62,16 +65,13 @@ public class GraphButton extends Button {
 		for (Object civObj : civilianObjects) {
 			if (civObj instanceof Civilian) {
 				civilians.add((Civilian) civObj);
-				System.out.println(((Civilian) civObj).getName());
-				System.out.println(((Civilian) civObj).getLocation());
+
 				graph.getVertices().add(new Vertex<Individual>((Civilian) civObj, 1));
-				Integer[] coords = HelperFunctions.extractCoords(((Civilian) civObj).getLocation());
-				System.out.println(coords[0]);
-				System.out.println(coords[1]);
+				Double[] coords = HelperFunctions.extractCoords(((Civilian) civObj).getLocation());
 
 				Circle circle = new Circle(10, Color.BLUE);
 				Label civNameLabel = new Label(((Civilian) civObj).getName());
-				civNameLabel.setTextFill(Color.DARKOLIVEGREEN);
+				civNameLabel.setTextFill(Color.YELLOWGREEN);
 				circle.setCenterX(coords[0] * 50);
 				circle.setCenterY(coords[1] * 50);
 				civNameLabel.setLayoutX(circle.getCenterX() - circle.getRadius());
@@ -88,18 +88,23 @@ public class GraphButton extends Button {
 		}
 
 		// getting list of objects from security file
-		List<Object> securityCompanyObjects = HelperFunctions.readClassesFromFile(pathToReadSecurityCompany);
+		List<Object> securityCompanyObjects = HelperFunctions.readClassesFromFile(pathToReadSecurityCompany, SecurityCompany.class);
 		List<SecurityCompany> securityCompanies = new ArrayList<>();
-
+		Vertex<Individual> prevSecurityCompany = null;
+		int counter = 0;
 		// adding security companies as vertices to graph
 		for (Object secObj : securityCompanyObjects) {
 			if (secObj instanceof SecurityCompany) {
+				Circle node1 = null;
+				Circle node2 = null;
 				securityCompanies.add((SecurityCompany) secObj);
-				graph.getVertices().add(new Vertex<Individual>((SecurityCompany) secObj, 2));
-				Integer[] coords = HelperFunctions.extractCoords(((SecurityCompany) secObj).getLocation());
+				Vertex<Individual> securityCompany = new Vertex<Individual>((SecurityCompany) secObj, 2);
+				graph.getVertices().add(securityCompany);
+
+				Double[] coords = HelperFunctions.extractCoords(((SecurityCompany) secObj).getLocation());
 				Circle circle = new Circle(10, Color.RED);
 				Label secNameLabel = new Label(((SecurityCompany) secObj).getName());
-				secNameLabel.setTextFill(Color.DARKOLIVEGREEN);
+				secNameLabel.setTextFill(Color.YELLOWGREEN);
 				circle.setCenterX(coords[0] * 50);
 				circle.setCenterY(coords[1] * 50);
 				secNameLabel.setLayoutX(circle.getCenterX() - circle.getRadius());
@@ -111,12 +116,34 @@ public class GraphButton extends Button {
 				circleArray[row] = circle;
 				uuidArray[row] = ((SecurityCompany) secObj).getId();
 				row += 1;
+				if (counter == 0) {
+					prevSecurityCompany = securityCompany;
+				} else {
+					Edge<Individual> incidentEdge = new Edge<Individual>(3, securityCompany, prevSecurityCompany);
+					graph.getEdges().add(incidentEdge);
+					prevSecurityCompany = securityCompany;
+					Line line = new Line();
+					// Set the line's color and width:
+					line.setStroke(Color.GREEN);
+					line.setStrokeWidth(5);
+					node1 = circleArray[row - 1];
+					node2 = circleArray[row - 2];
+					line.setStartX(node1.getCenterX());
+					line.setStartY(node1.getCenterY());
+					line.setEndX(node2.getCenterX());
+					line.setEndY(node2.getCenterY());
+					if (!pane.getChildren().contains(line)) {
+						pane.getChildren().add(line);
+					}
+				}
+
+				counter++;
 
 			}
 		}
 
 		// getting list of objects from community police file
-		List<Object> communityPoliceObjects = HelperFunctions.readClassesFromFile(pathToReadCommunityPolice);
+		List<Object> communityPoliceObjects = HelperFunctions.readClassesFromFile(pathToReadCommunityPolice, CommunityPolice.class);
 		List<CommunityPolice> communityPolicies = new ArrayList<>();
 
 		// adding community police as vertices to graph
@@ -124,10 +151,10 @@ public class GraphButton extends Button {
 			if (comPopoObj instanceof CommunityPolice) {
 				communityPolicies.add((CommunityPolice) comPopoObj);
 				graph.getVertices().add(new Vertex<Individual>((CommunityPolice) comPopoObj, 3));
-				Integer[] coords = HelperFunctions.extractCoords(((CommunityPolice) comPopoObj).getLocation());
+				Double[] coords = HelperFunctions.extractCoords(((CommunityPolice) comPopoObj).getLocation());
 				Circle circle = new Circle(10, Color.ORANGE);
 				Label commLabel = new Label("COMMUNITY POLICE");
-				commLabel.setTextFill(Color.DARKOLIVEGREEN);
+				commLabel.setTextFill(Color.YELLOWGREEN);
 				circle.setCenterX(coords[0] * 50);
 				circle.setCenterY(coords[1] * 50);
 				commLabel.setLayoutX(circle.getCenterX() - circle.getRadius());
@@ -144,10 +171,10 @@ public class GraphButton extends Button {
 		}
 
 		// getting all incidents saved, which will be the edges between the nodes
-		List<Object> incidentObjects = HelperFunctions.readClassesFromFile(pathToReadIncidents);
+		List<Object> incidentObjects = HelperFunctions.readClassesFromFile(pathToReadIncidents, Incident.class);
 		List<Incident> incidents = new ArrayList<>();
-		Integer[] civilianCoords = null;
-		Integer[] responderCoords = null;
+		Double[] civilianCoords = null;
+		Double[] responderCoords = null;
 		Boolean foundEdge = false;
 		// adding community police as vertices to graph
 		for (Object incidentObj : incidentObjects) {
@@ -172,11 +199,12 @@ public class GraphButton extends Button {
 										.extractCoords(((Incident) incidentObj).getSecurityCompany().getLocation());
 							}
 						}
-						Edge<Individual> incidentEdge = new Edge<Individual>(((Incident) incidentObj).getSeverity(), v1,
-								v2);
+						int weight = AlgorithmHelperFunctions.getEdgeWeight(((Incident) incidentObj).getSeverity(),
+								AlgorithmHelperFunctions.getDistance(civilianCoords, responderCoords));
+						Edge<Individual> incidentEdge = new Edge<Individual>(weight, v1, v2);
 						Line line = new Line();
 						// Set the line's color and width:
-						line.setStroke(Color.WHITE);
+						line.setStroke(Color.GREEN);
 						line.setStrokeWidth(5);
 						for (int i = 0; i < uuidArray.length; i++) {
 							Circle node1 = null;
@@ -194,12 +222,12 @@ public class GraphButton extends Button {
 
 							}
 						}
-						Label edgeWeightLabel = new Label((((Incident) incidentObj).getSeverity()).toString());
+						Label edgeWeightLabel = new Label(Integer.toString(weight));
 						double centerX = (line.getStartX() + line.getEndX()) / 2;
 						double centerY = (line.getStartY() + line.getEndY()) / 2;
 						edgeWeightLabel.setLayoutX(centerX);
 						edgeWeightLabel.setLayoutY(centerY);
-						edgeWeightLabel.setTextFill(Color.DARKOLIVEGREEN);
+						edgeWeightLabel.setTextFill(Color.YELLOW);
 						nodeLabels.add(edgeWeightLabel);
 						if (!pane.getChildren().contains(line)) {
 							pane.getChildren().add(line);
@@ -214,9 +242,9 @@ public class GraphButton extends Button {
 					}
 				}
 				if (v1 != null && v2 != null) {
-					System.out.println(v2.compareTo(v1));
-					Edge<Individual> incidentEdge = new Edge<Individual>(((Incident) incidentObj).getSeverity(), v1,
-							v2);
+					int weight = AlgorithmHelperFunctions.getEdgeWeight(((Incident) incidentObj).getSeverity(),
+							AlgorithmHelperFunctions.getDistance(civilianCoords, responderCoords));
+					Edge<Individual> incidentEdge = new Edge<Individual>(weight, v1, v2);
 					graph.getEdges().add(incidentEdge);
 					v1 = null;
 					v2 = null;
@@ -231,10 +259,14 @@ public class GraphButton extends Button {
 				pane.getChildren().add(label);
 			}
 		}
-		// System.out.println(graph.getEdges());
-		System.out.println(graph);
 
 		graphStage.showAndWait();
+	}
+	
+	public void setElementsToNothing(){
+		nodeLabels.clear();
+		Arrays.fill(circleArray, null);
+		Arrays.fill(uuidArray, null);
 	}
 
 }

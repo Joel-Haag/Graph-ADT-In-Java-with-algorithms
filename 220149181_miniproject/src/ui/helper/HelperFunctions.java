@@ -1,17 +1,21 @@
 package ui.helper;
 
-import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import nodes.Civilian;
+import nodes.SecurityCompany;
+import nodes.CommunityPolice;
+import nodes.Incident;
 
 public class HelperFunctions {
 
@@ -33,6 +37,7 @@ public class HelperFunctions {
 			fos = new FileOutputStream(pathToWrite, true);
 
 			if (f.length() == 0) {
+				System.out.println("attempting to add correctly");
 				ObjectOutputStream oos = new ObjectOutputStream(fos);
 				oos.writeObject(objectToAdd);
 				oos.close();
@@ -41,7 +46,6 @@ public class HelperFunctions {
 				MyObjectOutputStream oos = null;
 				oos = new MyObjectOutputStream(fos);
 				oos.writeObject(objectToAdd);
-
 				oos.close();
 			}
 			fos.close();
@@ -56,7 +60,7 @@ public class HelperFunctions {
 		}
 	}
 
-	public static List<Object> readClassesFromFile(String pathToRead) {
+	public static List<Object> readClassesFromFile(String pathToRead, Class<?> className) {
 		File f = new File(pathToRead);
 		// Try block to check for exceptions
 		try {
@@ -78,7 +82,9 @@ public class HelperFunctions {
 				Object obj = null;
 				while (fis.available() != 0) {
 					obj = (Object) ois.readObject();
-					objects.add(obj);
+					 if (className.isInstance(obj)) {
+		                    objects.add(obj);
+		                }
 				}
 
 				ois.close();
@@ -90,8 +96,149 @@ public class HelperFunctions {
 		}
 		return objects;
 	}
+
 	
-	public static Integer[] extractCoords(String input) {
+	public static void removeCivilianFromFile(String pathToRead, UUID classID) {
+
+        List<Object> civilians = readClassesFromFile(pathToRead, Civilian.class);
+        Iterator<Object> civilianIterator = civilians.iterator();
+        
+
+        
+        while (civilianIterator.hasNext()) {
+            Object civilian = civilianIterator.next();
+            if (((Civilian) civilian).getId().equals(classID)) {
+            	civilianIterator.remove();
+        		System.out.println(((Civilian) civilian).getName());
+
+            	
+            }
+        }
+        
+        File civFile = new File(pathToRead);
+        civFile.delete();
+        
+        for(Object civilian: civilians) {
+        	Civilian civ = (Civilian) civilian;
+        	appendClassToFile(pathToRead, civ);
+        }
+        
+        
+       
+        
+        List<Object> incidents = readClassesFromFile("./data/Incident.binary", Incident.class);
+        Iterator<Object> incidentsIterator = incidents.iterator();
+        while (incidentsIterator.hasNext()) {
+            Object incident = incidentsIterator.next();
+            if (((Incident) incident).civilian.getId().equals(classID)) {
+            	incidentsIterator.remove();
+            }
+        }
+        
+        File inciFile = new File("./data/Incident.binary");
+        inciFile.delete();
+        
+        for(Object incident: incidents) {
+        	Incident inc = (Incident) incidents;
+        	appendClassToFile("./data/Incident.binary", inc);
+        }
+        
+        
+	}
+	
+	public static void removeSecurityCompanyFromFile(String pathToRead, UUID classID) {
+
+        List<Object> securityCompanies = readClassesFromFile(pathToRead, SecurityCompany.class);
+        Iterator<Object> securityCompanyIterator = securityCompanies.iterator();
+        
+
+        
+        while (securityCompanyIterator.hasNext()) {
+            Object security = securityCompanyIterator.next();
+            if (((SecurityCompany) security).getId().equals(classID)) {
+            	securityCompanyIterator.remove();
+            	
+            }
+        }
+        
+        File secFile = new File(pathToRead);
+        secFile.delete();
+        
+        for(Object security: securityCompanies) {
+        	SecurityCompany sec = (SecurityCompany) security;
+        	appendClassToFile(pathToRead, sec);
+        }
+        
+        
+       
+        
+        List<Object> incidents = readClassesFromFile("./data/Incident.binary", Incident.class);
+        Iterator<Object> incidentsIterator = incidents.iterator();
+        while (incidentsIterator.hasNext()) {
+            Object incident = incidentsIterator.next();
+            if (((Incident) incident).securityCompany.getId().equals(classID)) {
+            	incidentsIterator.remove();
+            }
+        }
+        
+        File inciFile = new File("./data/Incident.binary");
+        inciFile.delete();
+        
+        for(Object incident: incidents) {
+        	Incident inc = (Incident) incidents;
+        	appendClassToFile("./data/Incident.binary", inc);
+        }
+        
+        
+	}
+	
+	public static void removeCommunityPoliceFromFile(String pathToRead, UUID classID) {
+
+        List<Object> communityPolices = readClassesFromFile(pathToRead, CommunityPolice.class);
+        Iterator<Object> communityPoliceIterator = communityPolices.iterator();
+        
+
+        
+        while (communityPoliceIterator.hasNext()) {
+            Object security = communityPoliceIterator.next();
+            if (((CommunityPolice) security).getId().equals(classID)) {
+            	communityPoliceIterator.remove();
+            	
+            }
+        }
+        
+        File comPoFile = new File(pathToRead);
+        comPoFile.delete();
+        
+        for(Object police: communityPolices) {
+        	CommunityPolice popo = (CommunityPolice) police;
+        	appendClassToFile(pathToRead, popo);
+        }
+        
+        
+       
+        
+        List<Object> incidents = readClassesFromFile("./data/Incident.binary", Incident.class);
+        Iterator<Object> incidentsIterator = incidents.iterator();
+        while (incidentsIterator.hasNext()) {
+            Object incident = incidentsIterator.next();
+            if (((Incident) incident).communityPolice.getId().equals(classID)) {
+            	incidentsIterator.remove();
+            }
+        }
+        
+        File inciFile = new File("./data/Incident.binary");
+        inciFile.delete();
+        
+        for(Object incident: incidents) {
+        	Incident inc = (Incident) incidents;
+        	appendClassToFile("./data/Incident.binary", inc);
+        }
+        
+        
+	}
+	
+	public static Double[] extractCoords(String input) {
 	    // Define a regular expression that matches two doubles separated by a colon
 	    String regex = "(\\d+(\\.\\d+)?):(\\d+(\\.\\d+)?)";
 
@@ -104,17 +251,19 @@ public class HelperFunctions {
 	    // If a match is found, extract the two doubles and return them as a double array
 	    if (matcher.find()) {
 	        try {
-	            int firstDouble = Integer.parseInt(matcher.group(1));
-	            int secondDouble = Integer.parseInt(matcher.group(3));
-	            return new Integer[]{firstDouble, secondDouble};
+	            double firstDouble = Double.parseDouble(matcher.group(1));
+	            double secondDouble = Double.parseDouble(matcher.group(3));
+	            return new Double[]{firstDouble, secondDouble};
 	        } catch (NumberFormatException e) {
 	            System.err.println("Error: Unable to parse double from input string.");
-	            return new Integer[]{Integer.BYTES, Integer.BYTES};
+	            return null;
 	        }
 	    } else {
 	        System.err.println("Error: Input string does not match expected format.");
-	        return new Integer[]{Integer.BYTES, Integer.BYTES};
+	        return null;
 	    }
 	}
+	
+	
 
 }

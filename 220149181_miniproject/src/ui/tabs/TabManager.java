@@ -1,5 +1,8 @@
 package ui.tabs;
 
+import javafx.event.Event;
+import javafx.event.EventHandler;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 
 public class TabManager {
@@ -14,6 +17,8 @@ public class TabManager {
         DataTab data = new DataTab();
         IncidentHandleTab incidentHandle = new IncidentHandleTab();
         GraphTab graph = new GraphTab();
+        
+        
         tabPane.getTabs().addAll(home, data, incidentHandle, graph);
     }
 

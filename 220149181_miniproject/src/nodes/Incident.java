@@ -3,9 +3,9 @@ package nodes;
 import java.io.Serializable;
 
 public class Incident implements Serializable, Comparable<Incident> {
-	private Civilian civilian;
-	private SecurityCompany securityCompany;
-	private CommunityPolice communityPolice;
+	public Civilian civilian;
+	public SecurityCompany securityCompany;
+	public CommunityPolice communityPolice;
 	private Double distance;
 	private Integer severity;
 	private String description;
