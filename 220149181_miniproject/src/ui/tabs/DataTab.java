@@ -153,9 +153,9 @@ public class DataTab extends Tab {
 				});
 				VBox oneSecData = new VBox(secIDLabel, secNameLabel, secLocationLabel, secPriceLabel);
 				oneSecData.setStyle(cssLayout);
-				HBox civDataAndButtons = new HBox(oneSecData, removeSecData);
-				civDataAndButtons.setSpacing(10);
-				securityCompanyModalContent.getChildren().add(civDataAndButtons);
+				HBox secDataAndButtons = new HBox(oneSecData, removeSecData);
+				secDataAndButtons.setSpacing(10);
+				securityCompanyModalContent.getChildren().add(secDataAndButtons);
 			}
 
 			ScrollPane scroll = new ScrollPane();
@@ -163,7 +163,7 @@ public class DataTab extends Tab {
 			// Setting content to the scroll pane
 			scroll.setContent(securityCompanyModalContent);
 			// add the vbox to the scene and set it as the content for the modal
-			Scene modalScene = new Scene(scroll, 300, 400);
+			Scene modalScene = new Scene(scroll, 400, 400);
 			SecurityCompanyModal.setScene(modalScene);
 
 			// show the modal
@@ -215,8 +215,9 @@ public class DataTab extends Tab {
 				removeCommunityPoliceButton.setOnAction(event -> {
 					HelperFunctions.removeSecurityCompanyFromFile(pathToReadCommunityPolice, comPopo.getId());
 				});
-				HBox civDataAndButtons = new HBox(oneComPopoData, removeCommunityPoliceButton);
-				communityPoliceModalContent.getChildren().add(civDataAndButtons);
+				HBox comDataAndButtons = new HBox(oneComPopoData, removeCommunityPoliceButton);
+				comDataAndButtons.setSpacing(10);
+				communityPoliceModalContent.getChildren().add(comDataAndButtons);
 			}
 
 			ScrollPane scroll = new ScrollPane();
@@ -224,7 +225,7 @@ public class DataTab extends Tab {
 			// Setting content to the scroll pane
 			scroll.setContent(communityPoliceModalContent);
 			// add the vbox to the scene and set it as the content for the modal
-			Scene modalScene = new Scene(scroll, 300, 400);
+			Scene modalScene = new Scene(scroll, 400, 400);
 			CommunityPoliceModal.setScene(modalScene);
 
 			// show the modal

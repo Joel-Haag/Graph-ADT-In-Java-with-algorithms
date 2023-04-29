@@ -36,6 +36,7 @@ import nodes.Incident;
 import nodes.Individual;
 import nodes.SecurityCompany;
 import ui.buttons.GraphButton;
+import ui.buttons.MinimumSpanningTreeGraphButton;
 import ui.helper.HelperFunctions;
 
 public class GraphTab extends Tab {
@@ -57,14 +58,17 @@ public class GraphTab extends Tab {
 		GraphButton showGraphButton = new GraphButton("View");
 		
 		
-		Label showRecommendedGraphLabel = new Label("View Reccomended graph to organise data");
+		Label showRecommendedGraphLabel = new Label("View Reccomended graph to connect nodes using"
+				+ "\n Prim's algorithm for minimum spanning tree");
+		MinimumSpanningTreeGraphButton showMSTGraphButton = new MinimumSpanningTreeGraphButton("View");
 		
-		graphTabContentVbox.getChildren().addAll(showInitialGraphLabel, showGraphButton, showRecommendedGraphLabel);
+		graphTabContentVbox.getChildren().addAll(showInitialGraphLabel, showGraphButton, showRecommendedGraphLabel, showMSTGraphButton);
 		graphTabContentVbox.setAlignment(Pos.TOP_CENTER);
 		graphTabContentVbox.setSpacing(20);
 		graphTabContentVbox.setPadding( new Insets(20));
 		
 		showGraphButton.setOnAction(e -> showGraphButton.createGraph()); // add an action to the button
+		showMSTGraphButton.setOnAction(e -> showMSTGraphButton.createGraph()); // add an action to the button
 
 
 

@@ -236,8 +236,56 @@ public class GraphButton extends Button {
 					}
 				} else {
 					if (((Incident) incidentObj).getCommunityPolice() != null) {
+						System.out.println("AOLEFGH:OLAIDSHGF:OLIDGH");
+						System.out.println(((Incident) incidentObj).getCommunityPolice().getId());
 						if (((Incident) incidentObj).getCivilian() != null) {
+							List<Vertex<Individual>> theVertices = graph.getVertices();
+							for (Vertex<Individual> vertex : theVertices) {
+								if (vertex.getValue().getId().equals(((Incident) incidentObj).getCivilian().getId())) {
+									v1 = vertex;
+									civilianCoords = HelperFunctions
+											.extractCoords(((Incident) incidentObj).getCivilian().getLocation());
+								}
+								if (vertex.getValue().getId()
+										.equals(((Incident) incidentObj).getCommunityPolice().getId())) {
+									v2 = vertex;
+									responderCoords = HelperFunctions
+											.extractCoords(((Incident) incidentObj).getCommunityPolice().getLocation());
+								}
+							}
+							int weight = AlgorithmHelperFunctions.getEdgeWeight(((Incident) incidentObj).getSeverity(),
+									AlgorithmHelperFunctions.getDistance(civilianCoords, responderCoords));
+							Edge<Individual> incidentEdge = new Edge<Individual>(weight, v1, v2);
+							Line line = new Line();
+							// Set the line's color and width:
+							line.setStroke(Color.GREEN);
+							line.setStrokeWidth(5);
+							for (int i = 0; i < uuidArray.length; i++) {
+								Circle node1 = null;
+								Circle node2 = null;
+								UUID uuid = uuidArray[i];
+								if (((Incident) incidentObj).getCivilian().getId().equals(uuid)) {
+									node1 = circleArray[i];
+									line.setStartX(node1.getCenterX());
+									line.setStartY(node1.getCenterY());
 
+								} else if (((Incident) incidentObj).getCommunityPolice().getId().equals(uuid)) {
+									node2 = circleArray[i];
+									line.setEndX(node2.getCenterX());
+									line.setEndY(node2.getCenterY());
+
+								}
+							}
+							Label edgeWeightLabel = new Label(Integer.toString(weight));
+							double centerX = (line.getStartX() + line.getEndX()) / 2;
+							double centerY = (line.getStartY() + line.getEndY()) / 2;
+							edgeWeightLabel.setLayoutX(centerX);
+							edgeWeightLabel.setLayoutY(centerY);
+							edgeWeightLabel.setTextFill(Color.YELLOW);
+							nodeLabels.add(edgeWeightLabel);
+							if (!pane.getChildren().contains(line)) {
+								pane.getChildren().add(line);
+							}
 						}
 					}
 				}
@@ -261,6 +309,7 @@ public class GraphButton extends Button {
 		}
 
 		graphStage.showAndWait();
+		System.out.println(graph.getEdges());
 	}
 	
 	public void setElementsToNothing(){

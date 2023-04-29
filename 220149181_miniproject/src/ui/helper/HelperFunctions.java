@@ -139,7 +139,7 @@ public class HelperFunctions {
         inciFile.delete();
         
         for(Object incident: incidents) {
-        	Incident inc = (Incident) incidents;
+        	Incident inc = (Incident) incident;
         	appendClassToFile("./data/Incident.binary", inc);
         }
         
@@ -185,7 +185,7 @@ public class HelperFunctions {
         inciFile.delete();
         
         for(Object incident: incidents) {
-        	Incident inc = (Incident) incidents;
+        	Incident inc = (Incident) incident;
         	appendClassToFile("./data/Incident.binary", inc);
         }
         
@@ -200,8 +200,8 @@ public class HelperFunctions {
 
         
         while (communityPoliceIterator.hasNext()) {
-            Object security = communityPoliceIterator.next();
-            if (((CommunityPolice) security).getId().equals(classID)) {
+            Object comPoplice = communityPoliceIterator.next();
+            if (((CommunityPolice) comPoplice).getId().equals(classID)) {
             	communityPoliceIterator.remove();
             	
             }
@@ -231,7 +231,7 @@ public class HelperFunctions {
         inciFile.delete();
         
         for(Object incident: incidents) {
-        	Incident inc = (Incident) incidents;
+        	Incident inc = (Incident) incident;
         	appendClassToFile("./data/Incident.binary", inc);
         }
         

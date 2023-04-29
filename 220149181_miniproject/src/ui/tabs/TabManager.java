@@ -1,5 +1,7 @@
 package ui.tabs;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.control.Tab;
@@ -20,6 +22,17 @@ public class TabManager {
         
         
         tabPane.getTabs().addAll(home, data, incidentHandle, graph);
+        
+        tabPane.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
+            @Override
+            public void changed(ObservableValue<? extends Tab> observable, Tab oldTab, Tab newTab) {
+                if (newTab instanceof IncidentHandleTab) {
+                    IncidentHandleTab incidentHandleTab = (IncidentHandleTab) newTab;
+                    incidentHandleTab.refresh();
+                }
+            }
+        });
+        
     }
 
 

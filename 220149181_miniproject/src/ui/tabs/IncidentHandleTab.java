@@ -33,8 +33,13 @@ public class IncidentHandleTab extends Tab {
 	private SecurityCompany securityCompany = null;
 	private CommunityPolice communityPolice = null;
 	private Boolean addedCorrectely = false;
+	
+	private ComboBox<Civilian> civilianComboBox;
+	private ComboBox<SecurityCompany> securityCompComboBox;
+	private ComboBox<CommunityPolice> comPopoComboBox;
 
 	public IncidentHandleTab() {
+		
 		setClosable(false);
 		setText("Handle Incidents");
 
@@ -63,7 +68,7 @@ public class IncidentHandleTab extends Tab {
 			}
 		}
 
-		ComboBox<Civilian> civilianComboBox = new ComboBox<>();
+		civilianComboBox = new ComboBox<>();
 		civilianComboBox.getItems().addAll(civilians);
 
 		civilianComboBox.setCellFactory(param -> new ListCell<Civilian>() {
@@ -100,7 +105,7 @@ public class IncidentHandleTab extends Tab {
 			}
 		}
 
-		ComboBox<SecurityCompany> securityCompComboBox = new ComboBox<>();
+		securityCompComboBox = new ComboBox<>();
 		securityCompComboBox.getItems().addAll(securityCompanies);
 
 		securityCompComboBox.setCellFactory(param -> new ListCell<SecurityCompany>() {
@@ -136,7 +141,7 @@ public class IncidentHandleTab extends Tab {
 			}
 		}
 
-		ComboBox<CommunityPolice> comPopoComboBox = new ComboBox<>();
+		comPopoComboBox = new ComboBox<>();
 		comPopoComboBox.getItems().addAll(communityPolicies);
 
 		comPopoComboBox.setCellFactory(param -> new ListCell<CommunityPolice>() {
@@ -199,6 +204,7 @@ public class IncidentHandleTab extends Tab {
 				alert.showAndWait();
 			}
 			if (securityCompany != null)
+				communityPolice = null;
 				newIncident.setSecurityCompany(securityCompany);
 			if (communityPolice != null)
 				newIncident.setCommunityPolice(communityPolice);
@@ -233,5 +239,46 @@ public class IncidentHandleTab extends Tab {
 		IncidentHandleContentVbox.getChildren().addAll(IncidentHandleHeadingLabel, InfoLabel, comboBoxes, severityHBox,
 				descriptionHBox, savedIncidentCorrectlyLabel, submitIncidentButton);
 		setContent(IncidentHandleContentVbox);
+	}
+
+	public void refresh() {
+		communityPolice = null;
+		securityCompany = null;
+	    List<Object> civilianObjects = HelperFunctions.readClassesFromFile(pathToReadCivilian, Civilian.class);
+	    List<Civilian> civilians = new ArrayList<>();
+
+	    for (Object civObj : civilianObjects) {
+	        if (civObj instanceof Civilian) {
+	            civilians.add((Civilian) civObj);
+	        }
+	    }
+
+	    civilianComboBox.getItems().clear();
+	    civilianComboBox.getItems().addAll(civilians);
+	    
+		List<Object> securityCompObjects = HelperFunctions.readClassesFromFile(pathToReadSecurityCompany, SecurityCompany.class);
+		List<SecurityCompany> securityCompanies = new ArrayList<>();
+
+		for (Object secCompObj : securityCompObjects) {
+			if (secCompObj instanceof SecurityCompany) {
+				securityCompanies.add((SecurityCompany) secCompObj);
+			}
+		}
+
+		securityCompComboBox.getItems().clear();
+		securityCompComboBox.getItems().addAll(securityCompanies);
+		
+		List<Object> comPopoObjects = HelperFunctions.readClassesFromFile(pathToReadCommunityPolice, CommunityPolice.class);
+		List<CommunityPolice> communityPolicies = new ArrayList<>();
+
+		for (Object comPopoObj : comPopoObjects) {
+			if (comPopoObj instanceof CommunityPolice) {
+				communityPolicies.add((CommunityPolice) comPopoObj);
+			}
+		}
+
+		comPopoComboBox.getItems().clear();
+		comPopoComboBox.getItems().addAll(communityPolicies);
+		
 	}
 }
