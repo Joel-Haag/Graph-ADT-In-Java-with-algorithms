@@ -33,8 +33,8 @@ public class GraphButton extends Button {
 	private String pathToReadSecurityCompany = "./data/SecurityCompany.binary";
 	private String pathToReadCommunityPolice = "./data/CommunityPolice.binary";
 	private String pathToReadIncidents = "./data/Incident.binary";
-	private Circle[] circleArray = new Circle[30];
-	private UUID[] uuidArray = new UUID[30];
+	private Circle[] circleArray = new Circle[50];
+	private UUID[] uuidArray = new UUID[50];
 	private Integer row = 0;
 	private ArrayList<Label> nodeLabels = new ArrayList<>();
 
@@ -65,7 +65,6 @@ public class GraphButton extends Button {
 		for (Object civObj : civilianObjects) {
 			if (civObj instanceof Civilian) {
 				civilians.add((Civilian) civObj);
-
 				graph.getVertices().add(new Vertex<Individual>((Civilian) civObj, 1));
 				Double[] coords = HelperFunctions.extractCoords(((Civilian) civObj).getLocation());
 
@@ -82,17 +81,23 @@ public class GraphButton extends Button {
 				}
 				circleArray[row] = circle;
 				uuidArray[row] = ((Civilian) civObj).getId();
+				System.out.println("THE ROW IS for civilian " + row);
+
 				row += 1;
 
 			}
 		}
 
 		// getting list of objects from security file
-		List<Object> securityCompanyObjects = HelperFunctions.readClassesFromFile(pathToReadSecurityCompany, SecurityCompany.class);
+		List<Object> securityCompanyObjects = HelperFunctions.readClassesFromFile(pathToReadSecurityCompany,
+				SecurityCompany.class);
 		List<SecurityCompany> securityCompanies = new ArrayList<>();
 		Vertex<Individual> prevSecurityCompany = null;
 		int counter = 0;
+		SecurityCompany prevComp = null;
 		// adding security companies as vertices to graph
+		Circle[] tempSecurityCompanyCircleArray = new Circle[30];
+		UUID[] tempSecurityCompanyUUIDArray = new UUID[30];
 		for (Object secObj : securityCompanyObjects) {
 			if (secObj instanceof SecurityCompany) {
 				Circle node1 = null;
@@ -113,37 +118,58 @@ public class GraphButton extends Button {
 				if (!pane.getChildren().contains(circle)) {
 					pane.getChildren().add(circle);
 				}
+				
+				
+				tempSecurityCompanyCircleArray[counter] = circle;
+				tempSecurityCompanyUUIDArray[counter] = ((SecurityCompany) secObj).getId();
+				
 				circleArray[row] = circle;
 				uuidArray[row] = ((SecurityCompany) secObj).getId();
-				row += 1;
-				if (counter == 0) {
-					prevSecurityCompany = securityCompany;
-				} else {
-					Edge<Individual> incidentEdge = new Edge<Individual>(3, securityCompany, prevSecurityCompany);
-					graph.getEdges().add(incidentEdge);
-					prevSecurityCompany = securityCompany;
-					Line line = new Line();
-					// Set the line's color and width:
-					line.setStroke(Color.GREEN);
-					line.setStrokeWidth(5);
-					node1 = circleArray[row - 1];
-					node2 = circleArray[row - 2];
-					line.setStartX(node1.getCenterX());
-					line.setStartY(node1.getCenterY());
-					line.setEndX(node2.getCenterX());
-					line.setEndY(node2.getCenterY());
-					if (!pane.getChildren().contains(line)) {
-						pane.getChildren().add(line);
+				
+				System.out.println("THE ROW IS for security " + row);
+				row+=1;
+				counter +=1;
+
+				if (row > 1) {
+					for (int i = 0; i < counter - 1; i++) {
+						node1 = tempSecurityCompanyCircleArray[counter - 1];
+						node2 = tempSecurityCompanyCircleArray[i];
+
+						Double[] coordsPrev = HelperFunctions.extractCoords(securityCompanies.get(i).getLocation());
+						int securityWeight = (int) AlgorithmHelperFunctions.getDistance(coordsPrev, coords);
+						Edge<Individual> incidentEdge = new Edge<Individual>(securityWeight, securityCompany,
+								graph.getVertices().get(i));
+						graph.getEdges().add(incidentEdge);
+
+						Line line = new Line();
+						// Set the line's color and width:
+						line.setStroke(Color.GREEN);
+						line.setStrokeWidth(5);
+
+						line.setStartX(node1.getCenterX());
+						line.setStartY(node1.getCenterY());
+						line.setEndX(node2.getCenterX());
+						line.setEndY(node2.getCenterY());
+
+						Label edgeWeightLabel = new Label(Integer.toString(securityWeight));
+						double centerX = (line.getStartX() + line.getEndX()) / 2;
+						double centerY = (line.getStartY() + line.getEndY()) / 2;
+						edgeWeightLabel.setLayoutX(centerX);
+						edgeWeightLabel.setLayoutY(centerY);
+						edgeWeightLabel.setTextFill(Color.YELLOW);
+						nodeLabels.add(edgeWeightLabel);
+
+						if (!pane.getChildren().contains(line)) {
+							pane.getChildren().add(line);
+						}
 					}
 				}
-
-				counter++;
-
 			}
 		}
 
 		// getting list of objects from community police file
-		List<Object> communityPoliceObjects = HelperFunctions.readClassesFromFile(pathToReadCommunityPolice, CommunityPolice.class);
+		List<Object> communityPoliceObjects = HelperFunctions.readClassesFromFile(pathToReadCommunityPolice,
+				CommunityPolice.class);
 		List<CommunityPolice> communityPolicies = new ArrayList<>();
 
 		// adding community police as vertices to graph
@@ -165,6 +191,8 @@ public class GraphButton extends Button {
 				}
 				circleArray[row] = circle;
 				uuidArray[row] = ((CommunityPolice) comPopoObj).getId();
+				System.out.println("THE ROW IS for community police " + row);
+
 				row += 1;
 
 			}
@@ -236,8 +264,6 @@ public class GraphButton extends Button {
 					}
 				} else {
 					if (((Incident) incidentObj).getCommunityPolice() != null) {
-						System.out.println("AOLEFGH:OLAIDSHGF:OLIDGH");
-						System.out.println(((Incident) incidentObj).getCommunityPolice().getId());
 						if (((Incident) incidentObj).getCivilian() != null) {
 							List<Vertex<Individual>> theVertices = graph.getVertices();
 							for (Vertex<Individual> vertex : theVertices) {
@@ -266,6 +292,7 @@ public class GraphButton extends Button {
 								UUID uuid = uuidArray[i];
 								if (((Incident) incidentObj).getCivilian().getId().equals(uuid)) {
 									node1 = circleArray[i];
+									System.out.println();
 									line.setStartX(node1.getCenterX());
 									line.setStartY(node1.getCenterY());
 
@@ -299,7 +326,7 @@ public class GraphButton extends Button {
 				}
 
 			}
-
+  
 		}
 		for (Label label : nodeLabels) {
 			label.setFont(Font.font("System", FontWeight.BOLD, 13));
@@ -308,11 +335,80 @@ public class GraphButton extends Button {
 			}
 		}
 
+		// adding the edges between community police and civilians
+		List<Vertex<Individual>> vertices = graph.getVertices();
+		Circle communityPoliceCircle = null;
+		Circle civilianCircle = null;
+		for (Vertex<Individual> communityPoliceVertix : vertices) {
+			if (communityPoliceVertix.getWeight() == 3) {
+
+				Individual communityPolice = communityPoliceVertix.getValue();
+				UUID communityPoliceID = communityPolice.getId();
+				for (Vertex<Individual> civilianVertix : vertices) {
+					Line comCivLin = new Line();
+					// Set the line's color and width:
+					comCivLin.setStroke(Color.GREEN);
+					comCivLin.setStrokeWidth(5);
+					if (civilianVertix.getWeight() == 1) {
+						Edge<Individual> communityCivilian = new Edge<Individual>(2, communityPoliceVertix,
+								civilianVertix);
+						graph.getEdges().add(communityCivilian);
+
+						// now that I have both the community police ID and civilian ID I can check in
+						// my UUID list for where they are and connect the lines
+
+						Individual civilian = civilianVertix.getValue();
+						UUID civilianID = civilian.getId();
+						int communityIDCounter = 0;
+						for (UUID comPopoID : uuidArray) {
+							if (communityPoliceID.equals(comPopoID)) {
+								System.out.println(communityIDCounter);
+								System.out.println("THIS IS FIRST");
+							//	System.out.println(communityIDCounter);
+								communityPoliceCircle = circleArray[communityIDCounter];
+								if(communityPoliceCircle != null) {
+									comCivLin.setStartX(communityPoliceCircle.getCenterX());
+									comCivLin.setStartY(communityPoliceCircle.getCenterY());
+									System.out.println(comCivLin.getStartX());
+									System.out.println(comCivLin.getStartY());
+									break;
+								}			
+							}
+							communityIDCounter += 1;
+						}
+						
+						int civIDCounter = 0;
+						for (UUID civID : uuidArray) {
+						
+							if (civilianID.equals(civID)) {
+								System.out.println(civIDCounter);
+								System.out.println("THIS IS Second");
+								civilianCircle = circleArray[civIDCounter];
+								comCivLin.setEndX(civilianCircle.getCenterX());
+								comCivLin.setEndY(civilianCircle.getCenterY());
+								System.out.println(comCivLin.getEndX());
+								System.out.println(comCivLin.getEndY());
+								break;
+							}
+							civIDCounter += 1;
+						}
+						
+						if (!pane.getChildren().contains(comCivLin)) {
+							System.out.println("ADDINGGGGGGGGGGGGG");
+							pane.getChildren().add(comCivLin);
+						}
+
+					}
+
+				}
+			}
+		}
+
 		graphStage.showAndWait();
-		System.out.println(graph.getEdges());
+
 	}
-	
-	public void setElementsToNothing(){
+
+	public void setElementsToNothing() {
 		nodeLabels.clear();
 		Arrays.fill(circleArray, null);
 		Arrays.fill(uuidArray, null);
