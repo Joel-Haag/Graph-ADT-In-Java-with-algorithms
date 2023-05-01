@@ -2,8 +2,13 @@ package ui.buttons;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import com.jwetherell.algorithms.data_structures.Graph;
 import com.jwetherell.algorithms.data_structures.Graph.Edge;
@@ -26,10 +31,10 @@ import nodes.CommunityPolice;
 import nodes.Incident;
 import nodes.Individual;
 import nodes.SecurityCompany;
-import ui.helper.HelperFunctions;
 import nodes.algorithms.AlgorithmHelperFunctions;
+import ui.helper.HelperFunctions;
 
-public class GraphButton extends Button {
+public class MinimumSpanningTreeGraphButton extends Button {
 	private String pathToReadCivilian = "./data/Civilians.binary";
 	private String pathToReadSecurityCompany = "./data/SecurityCompany.binary";
 	private String pathToReadCommunityPolice = "./data/CommunityPolice.binary";
@@ -38,8 +43,10 @@ public class GraphButton extends Button {
 	private UUID[] uuidArray = new UUID[50];
 	private Integer row = 0;
 	private ArrayList<Label> nodeLabels = new ArrayList<>();
+	private int[] parent;
+	private int[] rank;
 
-	public GraphButton(String Graph) {
+	public MinimumSpanningTreeGraphButton(String Graph) {
 		super(Graph);
 		this.setStyle("-fx-font-size: 16pt;"); // set a custom style
 
@@ -82,7 +89,6 @@ public class GraphButton extends Button {
 				}
 				circleArray[row] = circle;
 				uuidArray[row] = ((Civilian) civObj).getId();
-
 				row += 1;
 
 			}
@@ -124,86 +130,26 @@ public class GraphButton extends Button {
 
 				circleArray[row] = circle;
 				uuidArray[row] = ((SecurityCompany) secObj).getId();
-
 				row += 1;
 				counter += 1;
-
-				if (row > 1) {
-					for (int i = 0; i < counter - 1; i++) {
-						node1 = tempSecurityCompanyCircleArray[counter - 1];
-						node2 = tempSecurityCompanyCircleArray[i];
-
-					    Double[] coordsPrev = HelperFunctions.extractCoords(securityCompanies.get(i).getLocation());
-					    int securityWeight = (int) AlgorithmHelperFunctions.getDistance(coordsPrev, coords);
-					    if(graph.getVertices().get(i).getValue() instanceof SecurityCompany) {
-					        Edge<Individual> incidentEdge = new Edge<Individual>(securityWeight, securityCompany,
-					            graph.getVertices().get(i));
-
-					        graph.getEdges().add(incidentEdge);
-					    }
+			}
 			
-
-						Line line = new Line();
-						// Set the line's color and width:
-						line.setStroke(Color.GREEN);
-						line.setStrokeWidth(5);
-
-						line.setStartX(node1.getCenterX());
-						line.setStartY(node1.getCenterY());
-						line.setEndX(node2.getCenterX());
-						line.setEndY(node2.getCenterY());
-
-						Label edgeWeightLabel = new Label(Integer.toString(securityWeight));
-						double centerX = (line.getStartX() + line.getEndX()) / 2;
-						double centerY = (line.getStartY() + line.getEndY()) / 2;
-						edgeWeightLabel.setLayoutX(centerX);
-						edgeWeightLabel.setLayoutY(centerY);
-						edgeWeightLabel.setTextFill(Color.YELLOW);
-						nodeLabels.add(edgeWeightLabel);
-
-						if (!pane.getChildren().contains(line)) {
-							pane.getChildren().add(line);
-						}
-					}
-					// create edges for last security company
-					if (counter > 1) {
-					    for (int i = 0; i < counter - 1; i++) {
-					        node1 = tempSecurityCompanyCircleArray[counter - 1];
-					        node2 = tempSecurityCompanyCircleArray[i];
-
-					        Double[] coordsPrev = HelperFunctions.extractCoords(securityCompanies.get(i).getLocation());
-					        int securityWeight = (int) AlgorithmHelperFunctions.getDistance(coordsPrev, coords);
-					        if(graph.getVertices().get(counter - 1).getValue() instanceof SecurityCompany) {
-					            Edge<Individual> incidentEdge = new Edge<Individual>(securityWeight, graph.getVertices().get(counter - 1),
-					                graph.getVertices().get(i));
-
-					            graph.getEdges().add(incidentEdge);
-					        }
-
-					        Line line = new Line();
-					        // Set the line's color and width:
-					        line.setStroke(Color.BLANCHEDALMOND);
-					        line.setStrokeWidth(5);
-
-					        line.setStartX(node1.getCenterX());
-					        line.setStartY(node1.getCenterY());
-					        line.setEndX(node2.getCenterX());
-					        line.setEndY(node2.getCenterY());
-
-					        Label edgeWeightLabel = new Label(Integer.toString(securityWeight));
-					        double centerX = (line.getStartX() + line.getEndX()) / 2;
-					        double centerY = (line.getStartY() + line.getEndY()) / 2;
-					        edgeWeightLabel.setLayoutX(centerX);
-					        edgeWeightLabel.setLayoutY(centerY);
-					        edgeWeightLabel.setTextFill(Color.RED);
-					        nodeLabels.add(edgeWeightLabel);
-
-					        if (!pane.getChildren().contains(line)) {
-					            pane.getChildren().add(line);
-					        }
-					    }
-					}
-				}
+			List<Vertex<Individual>> securityVertices = graph.getVertices().stream()
+				    .filter(v -> v.getValue() instanceof SecurityCompany)
+				    .collect(Collectors.toList());
+			System.out.println(securityVertices.size());
+			int counterer = 1;
+//
+			for (int i = 0; i < securityVertices.size(); i++) {
+			    Vertex<Individual> fromVertex = securityVertices.get(i);
+			    for (int j = i + 1; j < securityVertices.size(); j++) {
+			        Vertex<Individual> toVertex = securityVertices.get(j);
+					Double[] coordsFrom = HelperFunctions.extractCoords(fromVertex.getValue().getLocation());
+					Double[] coordsTo = HelperFunctions.extractCoords(toVertex.getValue().getLocation());
+					int securityWeight = (int) AlgorithmHelperFunctions.getDistance(coordsFrom, coordsTo);
+			        Edge<Individual> incidentEdge = new Edge<Individual>(securityWeight, fromVertex, toVertex);
+			        graph.getEdges().add(incidentEdge);
+			    }
 			}
 		}
 
@@ -231,7 +177,6 @@ public class GraphButton extends Button {
 				}
 				circleArray[row] = circle;
 				uuidArray[row] = ((CommunityPolice) comPopoObj).getId();
-
 				row += 1;
 
 			}
@@ -325,9 +270,9 @@ public class GraphButton extends Button {
 							// Set the line's color and width:
 							line.setStroke(Color.GREEN);
 							line.setStrokeWidth(5);
+							Circle node1 = null;
+							Circle node2 = null;
 							for (int i = 0; i < uuidArray.length; i++) {
-								Circle node1 = null;
-								Circle node2 = null;
 								UUID uuid = uuidArray[i];
 								if (((Incident) incidentObj).getCivilian().getId().equals(uuid)) {
 									node1 = circleArray[i];
@@ -366,6 +311,12 @@ public class GraphButton extends Button {
 			}
 
 		}
+		for (Label label : nodeLabels) {
+			label.setFont(Font.font("System", FontWeight.BOLD, 13));
+			if (!pane.getChildren().contains(label)) {
+				pane.getChildren().add(label);
+			}
+		}
 
 		// adding the edges between community police and civilians
 		List<Vertex<Individual>> vertices = graph.getVertices();
@@ -382,66 +333,187 @@ public class GraphButton extends Button {
 					comCivLin.setStroke(Color.GREEN);
 					comCivLin.setStrokeWidth(5);
 					if (civilianVertix.getWeight() == 1) {
-						Edge<Individual> communityCivilian = new Edge<Individual>(2, communityPoliceVertix,
+
+						Double[] communityPoliceCoords = HelperFunctions
+								.extractCoords(communityPoliceVertix.getValue().getLocation());
+						Double[] civCoords = HelperFunctions.extractCoords(civilianVertix.getValue().getLocation());
+						int civToCom = (int) AlgorithmHelperFunctions.getDistance(communityPoliceCoords, civCoords);
+						Edge<Individual> communityCivilian = new Edge<Individual>(civToCom, communityPoliceVertix,
 								civilianVertix);
 						graph.getEdges().add(communityCivilian);
-
-						// now that I have both the community police ID and civilian ID I can check in
-						// my UUID list for where they are and connect the lines
-
-						Individual civilian = civilianVertix.getValue();
-						UUID civilianID = civilian.getId();
-						int communityIDCounter = 0;
-						for (UUID comPopoID : uuidArray) {
-							if (communityPoliceID.equals(comPopoID)) {
-								// System.out.println(communityIDCounter);
-								communityPoliceCircle = circleArray[communityIDCounter];
-								if (communityPoliceCircle != null) {
-									comCivLin.setStartX(communityPoliceCircle.getCenterX());
-									comCivLin.setStartY(communityPoliceCircle.getCenterY());
-									break;
-								}
-							}
-							communityIDCounter += 1;
-						}
-
-						int civIDCounter = 0;
-						for (UUID civID : uuidArray) {
-
-							if (civilianID.equals(civID)) {
-								civilianCircle = circleArray[civIDCounter];
-								comCivLin.setEndX(civilianCircle.getCenterX());
-								comCivLin.setEndY(civilianCircle.getCenterY());
-								break;
-							}
-							civIDCounter += 1;
-						}
-						
-						Double[] vertixFromCoords = HelperFunctions.extractCoords(civilianVertix.getValue().getLocation());
-						Double[] vertixToCoords = HelperFunctions.extractCoords(communityPoliceVertix.getValue().getLocation());
-
-						
-						int weight = (int) AlgorithmHelperFunctions.getDistance(vertixFromCoords, vertixToCoords);
-				        Label edgeWeightLabel = new Label(Integer.toString(weight));
-				        double centerX = (comCivLin.getStartX() + comCivLin.getEndX()) / 2;
-				        double centerY = (comCivLin.getStartY() + comCivLin.getEndY()) / 2;
-				        edgeWeightLabel.setLayoutX(centerX);
-				        edgeWeightLabel.setLayoutY(centerY);
-				        edgeWeightLabel.setTextFill(Color.YELLOW);
-				        nodeLabels.add(edgeWeightLabel);
-
-						if (!pane.getChildren().contains(comCivLin)) {
-							comCivLin.toBack();
-
-							pane.getChildren().add(comCivLin);
-						}
 
 					}
 
 				}
 			}
 		}
-		
+
+		// creating the edges for community police and civilian using minimal spanning
+		// tree
+
+		List<Edge<Individual>> communityPoliceToCivilianEdges = new ArrayList<>(graph.getEdges());
+
+		for (Iterator<Edge<Individual>> iterator = communityPoliceToCivilianEdges.iterator(); iterator.hasNext();) {
+			Edge<Individual> edge = iterator.next();
+			if (edge.getFromVertex().getValue() instanceof SecurityCompany
+					|| edge.getToVertex().getValue() instanceof SecurityCompany) {
+				iterator.remove();
+			}
+		}
+
+		List<Vertex<Individual>> communityPoliceToCivilianVertices = new ArrayList<>(graph.getVertices());
+
+		for (Iterator<Vertex<Individual>> iterator = communityPoliceToCivilianVertices.iterator(); iterator
+				.hasNext();) {
+			Vertex<Individual> vertex = iterator.next();
+			if (vertex.getValue() instanceof SecurityCompany) {
+				iterator.remove();
+			}
+		}
+
+		List<Edge<Individual>> mstCommunityPoliceToCivilianGraphEdges = KruskalAlgorithm(communityPoliceToCivilianEdges,
+				communityPoliceToCivilianVertices);
+
+		for (Edge<Individual> edge : mstCommunityPoliceToCivilianGraphEdges) {
+			Line line = new Line();
+			line.setStroke(Color.GREEN);
+			line.setStrokeWidth(5);
+
+			Vertex<Individual> vertexFrom = edge.getFromVertex();
+			Vertex<Individual> vertexTo = edge.getToVertex();
+
+			Double[] vertixFromCoords = HelperFunctions.extractCoords(vertexFrom.getValue().getLocation());
+			Double[] vertixToCoords = HelperFunctions.extractCoords(vertexTo.getValue().getLocation());
+
+			for (int i = 0; i < uuidArray.length; i++) {
+				Circle node1 = null;
+				Circle node2 = null;
+				UUID uuid = uuidArray[i];
+				if (vertexFrom.getValue() instanceof Civilian) {
+					if (((Civilian) vertexFrom.getValue()).getId().equals(uuid)) {
+						node1 = circleArray[i];
+						line.setStartX(node1.getCenterX());
+						line.setStartY(node1.getCenterY());
+					}
+				}
+				if (vertexTo.getValue() instanceof Civilian) {
+					if (((Civilian) vertexTo.getValue()).getId().equals(uuid)) {
+						node2 = circleArray[i];
+						line.setEndX(node2.getCenterX());
+						line.setEndY(node2.getCenterY());
+					}
+				}
+				if (vertexFrom.getValue() instanceof CommunityPolice) {
+					if (((CommunityPolice) vertexFrom.getValue()).getId().equals(uuid)) {
+						node1 = circleArray[i];
+						line.setStartX(node1.getCenterX());
+						line.setStartY(node1.getCenterY());
+					}
+				}
+				if (vertexTo.getValue() instanceof CommunityPolice) {
+					if (((CommunityPolice) vertexTo.getValue()).getId().equals(uuid)) {
+						node2 = circleArray[i];
+						line.setEndX(node2.getCenterX());
+						line.setEndY(node2.getCenterY());
+					}
+				}
+			}
+			int weight = (int) AlgorithmHelperFunctions.getDistance(vertixFromCoords, vertixToCoords);
+			Label edgeWeightLabel = new Label(Integer.toString(weight));
+			double centerX = (line.getStartX() + line.getEndX()) / 2;
+			double centerY = (line.getStartY() + line.getEndY()) / 2;
+			edgeWeightLabel.setLayoutX(centerX);
+			edgeWeightLabel.setLayoutY(centerY);
+			edgeWeightLabel.setTextFill(Color.YELLOW);
+			nodeLabels.add(edgeWeightLabel);
+
+			if (!pane.getChildren().contains(line)) {
+				pane.getChildren().add(line);
+			}
+		}
+
+		// creating the edges between the security companies using minimal spanning tree
+
+		List<Edge<Individual>> securityCompanyEdges = new ArrayList<>(graph.getEdges());
+		int count = 1;
+		for (Iterator<Edge<Individual>> securityIterator = securityCompanyEdges.iterator(); securityIterator
+				.hasNext();) {
+			Edge<Individual> edge = securityIterator.next();
+			if (edge.getFromVertex().getValue() instanceof SecurityCompany
+					&& edge.getToVertex().getValue() instanceof SecurityCompany
+					&& !edge.getToVertex().getValue().getId().equals(edge.getFromVertex().getValue().getId())) {
+				count++;
+			} else {
+				securityIterator.remove();
+			}
+		}
+		System.out.println(securityCompanyEdges);
+
+		List<Vertex<Individual>> securityCompanyVertices = new ArrayList<>(graph.getVertices());
+
+		for (Iterator<Vertex<Individual>> securityIterator = securityCompanyVertices.iterator(); securityIterator
+				.hasNext();) {
+			Vertex<Individual> vertex = securityIterator.next();
+			if (vertex.getValue() instanceof SecurityCompany) {
+
+			} else {
+				securityIterator.remove();
+
+			}
+		}
+
+		List<Edge<Individual>> mstSecurityCompoanyGraphEdges = KruskalAlgorithm(securityCompanyEdges,
+				securityCompanyVertices);
+		for (Edge<Individual> edge : mstSecurityCompoanyGraphEdges) {
+			Line line = new Line();
+			line.setStroke(Color.BLANCHEDALMOND);
+			line.setStrokeWidth(5);
+
+			Vertex<Individual> vertexFrom = edge.getFromVertex();
+			Vertex<Individual> vertexTo = edge.getToVertex();
+
+			Double[] vertixFromCoords = HelperFunctions.extractCoords(vertexFrom.getValue().getLocation());
+			Double[] vertixToCoords = HelperFunctions.extractCoords(vertexTo.getValue().getLocation());
+
+			for (int i = 0; i < uuidArray.length; i++) {
+
+				Circle node1 = null;
+				Circle node2 = null;
+				UUID uuid = uuidArray[i];
+				if (vertexFrom.getValue() instanceof SecurityCompany) {
+					if (((SecurityCompany) vertexFrom.getValue()).getId().equals(uuid)) {
+						node1 = circleArray[i];
+						line.setStartX(node1.getCenterX());
+						line.setStartY(node1.getCenterY());
+					}
+				}
+				if (vertexTo.getValue() instanceof SecurityCompany) {
+
+					if (((SecurityCompany) vertexTo.getValue()).getId().equals(uuid)) {
+						node2 = circleArray[i];
+						line.setEndX(node2.getCenterX());
+						line.setEndY(node2.getCenterY());
+					}
+				}
+			}
+			int weight = (int) AlgorithmHelperFunctions.getDistance(vertixFromCoords, vertixToCoords);
+			Label edgeWeightLabel = new Label(Integer.toString(weight));
+			double centerX = (line.getStartX() + line.getEndX()) / 2;
+			double centerY = (line.getStartY() + line.getEndY()) / 2;
+			edgeWeightLabel.setLayoutX(centerX);
+			edgeWeightLabel.setLayoutY(centerY);
+			edgeWeightLabel.setTextFill(Color.RED);
+			nodeLabels.add(edgeWeightLabel);
+			if (!pane.getChildren().contains(line)) {
+				pane.getChildren().add(line);
+			}
+		}
+
+		// now making the graphs edges the original
+		graph.getEdges().clear();
+		graph.getEdges().addAll(mstCommunityPoliceToCivilianGraphEdges);
+		graph.getEdges().addAll(mstSecurityCompoanyGraphEdges);
+
 		for (Label label : nodeLabels) {
 			label.setFont(Font.font("System", FontWeight.BOLD, 13));
 			if (!pane.getChildren().contains(label)) {
@@ -464,6 +536,60 @@ public class GraphButton extends Button {
 		nodeLabels.clear();
 		Arrays.fill(circleArray, null);
 		Arrays.fill(uuidArray, null);
+	}
+
+	// function to return edges of minimal spanning tree using kruskal algorithm
+	private List<Edge<Individual>> KruskalAlgorithm(List<Edge<Individual>> edges, List<Vertex<Individual>> vertices) {
+		List<Edge<Individual>> mst = new ArrayList<>();
+		parent = new int[vertices.size()];
+		rank = new int[vertices.size()];
+		for (int i = 0; i < vertices.size(); i++) {
+			parent[i] = i;
+			rank[i] = 0;
+		}
+		Collections.sort(edges);
+		for (Edge<Individual> e : edges) {
+			int u = find(getIndex(vertices, e.getFromVertex()));
+			int v = find(getIndex(vertices, e.getToVertex()));
+			if (u != v) {
+				mst.add(e);
+				union(u, v);
+			}
+		}
+		return mst;
+
+	}
+
+	private int find(int i) {
+		if (parent[i] != i) {
+			parent[i] = find(parent[i]);
+		}
+		return parent[i];
+	}
+
+	private void union(int i, int j) {
+		int root1 = find(i);
+		int root2 = find(j);
+		if (root1 == root2) {
+			return;
+		}
+		if (rank[root1] > rank[root2]) {
+			parent[root2] = root1;
+		} else if (rank[root1] < rank[root2]) {
+			parent[root1] = root2;
+		} else {
+			parent[root2] = root1;
+			rank[root1]++;
+		}
+	}
+
+	private <T> int getIndex(List<Vertex<Individual>> vertices, Vertex<Individual> v) {
+		for (int i = 0; i < vertices.size(); i++) {
+			if (vertices.get(i).getValue().getId().equals(v.getValue().getId())) {
+				return i;
+			}
+		}
+		return -1;
 	}
 
 }
