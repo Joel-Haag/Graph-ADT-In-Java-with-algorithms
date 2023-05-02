@@ -2,10 +2,13 @@ package ui.buttons;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -26,6 +29,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 import nodes.Civilian;
 import nodes.CommunityPolice;
 import nodes.Incident;
@@ -34,7 +38,8 @@ import nodes.SecurityCompany;
 import nodes.algorithms.AlgorithmHelperFunctions;
 import ui.helper.HelperFunctions;
 
-public class MinimumSpanningTreeGraphButton extends Button {
+public class ShortestPathGraphButton extends Button {
+
 	private String pathToReadCivilian = "./data/Civilians.binary";
 	private String pathToReadSecurityCompany = "./data/SecurityCompany.binary";
 	private String pathToReadCommunityPolice = "./data/CommunityPolice.binary";
@@ -43,16 +48,14 @@ public class MinimumSpanningTreeGraphButton extends Button {
 	private UUID[] uuidArray = new UUID[50];
 	private Integer row = 0;
 	private ArrayList<Label> nodeLabels = new ArrayList<>();
-	private int[] parent;
-	private int[] rank;
 
-	public MinimumSpanningTreeGraphButton(String Graph) {
+	public ShortestPathGraphButton(String Graph) {
 		super(Graph);
 		this.setStyle("-fx-font-size: 16pt;"); // set a custom style
 
 	}
 
-	public void createGraph() {
+	public void createGraph(Incident incident) {
 		setElementsToNothing();
 		row = 0;
 		// getting list of objects from civilian file
@@ -89,6 +92,7 @@ public class MinimumSpanningTreeGraphButton extends Button {
 				}
 				circleArray[row] = circle;
 				uuidArray[row] = ((Civilian) civObj).getId();
+
 				row += 1;
 
 			}
@@ -125,17 +129,13 @@ public class MinimumSpanningTreeGraphButton extends Button {
 					pane.getChildren().add(circle);
 				}
 
-				tempSecurityCompanyCircleArray[counter] = circle;
-				tempSecurityCompanyUUIDArray[counter] = ((SecurityCompany) secObj).getId();
-
 				circleArray[row] = circle;
 				uuidArray[row] = ((SecurityCompany) secObj).getId();
 				row += 1;
-				counter += 1;
-			}
-			System.out.println(graph.getVertices().stream());
 
+			}
 		}
+
 		List<Vertex<Individual>> securityVertices = graph.getVertices().stream()
 				.filter(v -> v.getValue() instanceof SecurityCompany).collect(Collectors.toList());
 
@@ -148,8 +148,11 @@ public class MinimumSpanningTreeGraphButton extends Button {
 				int securityWeight = (int) AlgorithmHelperFunctions.getDistance(coordsFrom, coordsTo);
 				Edge<Individual> incidentEdge = new Edge<Individual>(securityWeight, fromVertex, toVertex);
 				graph.getEdges().add(incidentEdge);
+				fromVertex.addEdge(incidentEdge);
+				toVertex.addEdge(incidentEdge);
 			}
 		}
+
 		// getting list of objects from community police file
 		List<Object> communityPoliceObjects = HelperFunctions.readClassesFromFile(pathToReadCommunityPolice,
 				CommunityPolice.class);
@@ -174,34 +177,25 @@ public class MinimumSpanningTreeGraphButton extends Button {
 				}
 				circleArray[row] = circle;
 				uuidArray[row] = ((CommunityPolice) comPopoObj).getId();
+
 				row += 1;
 
 			}
 		}
 
-		for (Label label : nodeLabels) {
-			label.setFont(Font.font("System", FontWeight.BOLD, 13));
-			if (!pane.getChildren().contains(label)) {
-				pane.getChildren().add(label);
-			}
-		}
-
-		// adding the edges between community police and civilians
+		// adding the edges between community police and civilians and security
+		// companies
 		List<Vertex<Individual>> vertices = graph.getVertices();
-		Circle communityPoliceCircle = null;
-		Circle civilianCircle = null;
+
 		for (Vertex<Individual> communityPoliceVertix : vertices) {
 			if (communityPoliceVertix.getWeight() == 3) {
 
 				Individual communityPolice = communityPoliceVertix.getValue();
-				UUID communityPoliceID = communityPolice.getId();
 				for (Vertex<Individual> civilianVertix : vertices) {
-					Line comCivLin = new Line();
-					// Set the line's color and width:
-					comCivLin.setStroke(Color.GREEN);
-					comCivLin.setStrokeWidth(5);
-					if (civilianVertix.getWeight() == 1 || civilianVertix.getWeight() == 2) {
 
+					// Set the line's color and width:
+
+					if (civilianVertix.getWeight() == 1 || civilianVertix.getWeight() == 2) {
 						Double[] communityPoliceCoords = HelperFunctions
 								.extractCoords(communityPoliceVertix.getValue().getLocation());
 						Double[] civCoords = HelperFunctions.extractCoords(civilianVertix.getValue().getLocation());
@@ -209,93 +203,12 @@ public class MinimumSpanningTreeGraphButton extends Button {
 						Edge<Individual> communityCivilian = new Edge<Individual>(civToCom, communityPoliceVertix,
 								civilianVertix);
 						graph.getEdges().add(communityCivilian);
+						communityPoliceVertix.addEdge(communityCivilian);
+						civilianVertix.addEdge(communityCivilian);
 
 					}
 
 				}
-			}
-		}
-
-		// creating the edges for community police and civilian using minimal spanning
-		// tree
-
-		List<Edge<Individual>> communityPoliceToCivilianEdges = new ArrayList<>(graph.getEdges());
-
-		List<Vertex<Individual>> communityPoliceToCivilianVertices = new ArrayList<>(graph.getVertices());
-
-		List<Edge<Individual>> mstCommunityPoliceToCivilianGraphEdges = KruskalAlgorithm(communityPoliceToCivilianEdges,
-				communityPoliceToCivilianVertices);
-
-		for (Edge<Individual> edge : mstCommunityPoliceToCivilianGraphEdges) {
-			Line line = new Line();
-			line.setStroke(Color.GREEN);
-			line.setStrokeWidth(5);
-
-			Vertex<Individual> vertexFrom = edge.getFromVertex();
-			Vertex<Individual> vertexTo = edge.getToVertex();
-
-			Double[] vertixFromCoords = HelperFunctions.extractCoords(vertexFrom.getValue().getLocation());
-			Double[] vertixToCoords = HelperFunctions.extractCoords(vertexTo.getValue().getLocation());
-
-			for (int i = 0; i < uuidArray.length; i++) {
-				Circle node1 = null;
-				Circle node2 = null;
-				UUID uuid = uuidArray[i];
-				if (vertexFrom.getValue() instanceof Civilian) {
-					if (((Civilian) vertexFrom.getValue()).getId().equals(uuid)) {
-						node1 = circleArray[i];
-						line.setStartX(node1.getCenterX());
-						line.setStartY(node1.getCenterY());
-					}
-				}
-				if (vertexTo.getValue() instanceof Civilian) {
-					if (((Civilian) vertexTo.getValue()).getId().equals(uuid)) {
-						node2 = circleArray[i];
-						line.setEndX(node2.getCenterX());
-						line.setEndY(node2.getCenterY());
-					}
-				}
-				if (vertexFrom.getValue() instanceof CommunityPolice) {
-					if (((CommunityPolice) vertexFrom.getValue()).getId().equals(uuid)) {
-						node1 = circleArray[i];
-						line.setStartX(node1.getCenterX());
-						line.setStartY(node1.getCenterY());
-					}
-				}
-				if (vertexTo.getValue() instanceof CommunityPolice) {
-					if (((CommunityPolice) vertexTo.getValue()).getId().equals(uuid)) {
-						node2 = circleArray[i];
-						line.setEndX(node2.getCenterX());
-						line.setEndY(node2.getCenterY());
-					}
-				}
-				if (vertexFrom.getValue() instanceof SecurityCompany) {
-					if (((SecurityCompany) vertexFrom.getValue()).getId().equals(uuid)) {
-						node1 = circleArray[i];
-						line.setStartX(node1.getCenterX());
-						line.setStartY(node1.getCenterY());
-					}
-				}
-				if (vertexTo.getValue() instanceof SecurityCompany) {
-
-					if (((SecurityCompany) vertexTo.getValue()).getId().equals(uuid)) {
-						node2 = circleArray[i];
-						line.setEndX(node2.getCenterX());
-						line.setEndY(node2.getCenterY());
-					}
-				}
-			}
-			int weight = (int) AlgorithmHelperFunctions.getDistance(vertixFromCoords, vertixToCoords);
-			Label edgeWeightLabel = new Label(Integer.toString(weight));
-			double centerX = (line.getStartX() + line.getEndX()) / 2;
-			double centerY = (line.getStartY() + line.getEndY()) / 2;
-			edgeWeightLabel.setLayoutX(centerX);
-			edgeWeightLabel.setLayoutY(centerY);
-			edgeWeightLabel.setTextFill(Color.YELLOW);
-			nodeLabels.add(edgeWeightLabel);
-
-			if (!pane.getChildren().contains(line)) {
-				pane.getChildren().add(line);
 			}
 		}
 
@@ -313,6 +226,102 @@ public class MinimumSpanningTreeGraphButton extends Button {
 			}
 		}
 
+		Vertex<Individual> securityCompany = null;
+
+		for (int i = 0; i < uuidArray.length; i++) {
+			if (uuidArray[i] != null) {
+				if (uuidArray[i].equals(incident.getSecurityCompany().getId())) {
+					securityCompany = graph.getVertices().get(i);
+				}
+			}
+		}
+
+		Vertex<Individual> civilian = null;
+
+		for (int i = 0; i < uuidArray.length; i++) {
+			if (uuidArray[i] != null) {
+				if (uuidArray[i].equals(incident.getCivilian().getId())) {
+					civilian = graph.getVertices().get(i);
+				}
+			}
+		}
+
+		System.out.println(((SecurityCompany) securityCompany.getValue()).getName());
+		System.out.println(((Civilian) civilian.getValue()).getName());
+
+		List<Vertex<Individual>> path = dijkstraShortestPath(graph, securityCompany, civilian);
+		System.out.println(path);
+		Vertex<Individual> vertexFrom = null;
+		Vertex<Individual> vertexTo = null;
+		for (Vertex<Individual> ver : path) {
+
+			Line line = new Line();
+			line.setStroke(Color.GREEN);
+			line.setStrokeWidth(5);
+			vertexFrom = ver;
+			
+			if (vertexTo != null) {
+				Double[] vertixFromCoords = HelperFunctions.extractCoords(vertexFrom.getValue().getLocation());
+				Double[] vertixToCoords = HelperFunctions.extractCoords(vertexTo.getValue().getLocation());
+
+				for (int i = 0; i < uuidArray.length; i++) {
+					Circle node1 = null;
+					Circle node2 = null;
+					UUID uuid = uuidArray[i];
+					if (vertexFrom.getValue() instanceof Civilian) {
+						if (((Civilian) vertexFrom.getValue()).getId().equals(uuid)) {
+							node1 = circleArray[i];
+							line.setStartX(node1.getCenterX());
+							line.setStartY(node1.getCenterY());
+						}
+					}
+					if (vertexTo.getValue() instanceof Civilian) {
+						if (((Civilian) vertexTo.getValue()).getId().equals(uuid)) {
+							node2 = circleArray[i];
+							line.setEndX(node2.getCenterX());
+							line.setEndY(node2.getCenterY());
+						}
+					}
+					if (vertexFrom.getValue() instanceof CommunityPolice) {
+						if (((CommunityPolice) vertexFrom.getValue()).getId().equals(uuid)) {
+							node1 = circleArray[i];
+							line.setStartX(node1.getCenterX());
+							line.setStartY(node1.getCenterY());
+						}
+					}
+					if (vertexTo.getValue() instanceof CommunityPolice) {
+						if (((CommunityPolice) vertexTo.getValue()).getId().equals(uuid)) {
+							node2 = circleArray[i];
+							line.setEndX(node2.getCenterX());
+							line.setEndY(node2.getCenterY());
+						}
+					}
+					if (vertexFrom.getValue() instanceof SecurityCompany) {
+						if (((SecurityCompany) vertexFrom.getValue()).getId().equals(uuid)) {
+							node1 = circleArray[i];
+							line.setStartX(node1.getCenterX());
+							line.setStartY(node1.getCenterY());
+						}
+					}
+					if (vertexTo.getValue() instanceof SecurityCompany) {
+
+						if (((SecurityCompany) vertexTo.getValue()).getId().equals(uuid)) {
+							node2 = circleArray[i];
+							line.setEndX(node2.getCenterX());
+							line.setEndY(node2.getCenterY());
+						}
+					}
+				}
+				
+				
+				if (!pane.getChildren().contains(line)) {
+					pane.getChildren().add(line);
+				}
+			}
+			vertexTo = ver;
+
+		}
+
 		graphStage.showAndWait();
 
 	}
@@ -323,58 +332,68 @@ public class MinimumSpanningTreeGraphButton extends Button {
 		Arrays.fill(uuidArray, null);
 	}
 
-	// function to return edges of minimal spanning tree using kruskal algorithm
-	private List<Edge<Individual>> KruskalAlgorithm(List<Edge<Individual>> edges, List<Vertex<Individual>> vertices) {
-		List<Edge<Individual>> minimalSpanningTreeEdges = new ArrayList<>();
-		parent = new int[vertices.size()];
-		rank = new int[vertices.size()];
-		for (int i = 0; i < vertices.size(); i++) {
-			parent[i] = i;
-			rank[i] = 0;
+	public List<Vertex<Individual>> dijkstraShortestPath(Graph<Individual> graph, Vertex<Individual> source,
+			Vertex<Individual> target) {
+		Map<Vertex<Individual>, Vertex<Individual>> prevMap = new HashMap<>();
+		Map<Vertex<Individual>, Double> distMap = new HashMap<>();
+		Set<Vertex<Individual>> unvisitedNodes = new HashSet<>();
+
+		for (Vertex<Individual> v : graph.getVertices()) {
+			distMap.put(v, Double.POSITIVE_INFINITY);
+			unvisitedNodes.add(v);
 		}
-		Collections.sort(edges);
-		for (Edge<Individual> edge : edges) {
-			int firstIndex = findParent(getIndex(vertices, edge.getFromVertex()));
-			int secondIndex = findParent(getIndex(vertices, edge.getToVertex()));
-			if (firstIndex != secondIndex) {
-				minimalSpanningTreeEdges.add(edge);
-				mergeTrees(firstIndex, secondIndex);
+
+		distMap.put(source, 0.0);
+
+		while (!unvisitedNodes.isEmpty()) {
+			// System.out.println("1");
+			Vertex<Individual> current = unvisitedNodes.stream().min(Comparator.comparingDouble(distMap::get)).get();
+			// System.out.println("2 " + current);
+			unvisitedNodes.remove(current);
+
+			if (current.equals(target)) {
+				break;
 			}
-		}
-		return minimalSpanningTreeEdges;
 
-	}
+			// System.out.println("the current Edge" + current.getEdges());
 
-	private int findParent(int index) {
-		if (parent[index] != index) {
-			parent[index] = findParent(parent[index]);
-		}
-		return parent[index];
-	}
+			for (Edge<Individual> edge : current.getEdges()) {
+				// System.out.println("3 looping through edges" + edge);
+				Vertex<Individual> neighbor;
+				if (edge.getFromVertex().equals(current)) {
+					neighbor = edge.getToVertex();
+				} else {
+					neighbor = edge.getFromVertex();
+				}
 
-	private void mergeTrees(int indexOne, int indexTwo) {
-		int firstNode = findParent(indexOne);
-		int secondNode = findParent(indexTwo);
-		if (firstNode == secondNode) {
-			return;
-		}
-		if (rank[firstNode] > rank[secondNode]) {
-			parent[secondNode] = firstNode;
-		} else if (rank[firstNode] < rank[secondNode]) {
-			parent[firstNode] = secondNode;
-		} else {
-			parent[secondNode] = firstNode;
-			rank[firstNode]++;
-		}
-	}
+				// Continue only if the neighbor has not been visited yet
+				if (!unvisitedNodes.contains(neighbor)) {
+					continue;
+				}
 
-	private <T> int getIndex(List<Vertex<Individual>> vertices, Vertex<Individual> v) {
-		for (int i = 0; i < vertices.size(); i++) {
-			if (vertices.get(i).getValue().getId().equals(v.getValue().getId())) {
-				return i;
+				// Calculate the cost of traveling from the current vertex to the neighbor
+				System.out.println(current);
+				double alt = distMap.get(current) + edge.getCost();
+
+				// Update the distance and predecessor maps if the cost is lower than the
+				// current best
+				if (alt < distMap.get(neighbor)) {
+					distMap.put(neighbor, alt);
+					prevMap.put(neighbor, current);
+				}
 			}
+
 		}
-		return -1;
+
+		List<Vertex<Individual>> path = new ArrayList<>();
+		Vertex<Individual> current = target;
+		while (prevMap.containsKey(current)) {
+			path.add(current);
+			current = prevMap.get(current);
+		}
+		path.add(current);
+		// path = Lists.reverse(path);
+		return path;
 	}
 
 }

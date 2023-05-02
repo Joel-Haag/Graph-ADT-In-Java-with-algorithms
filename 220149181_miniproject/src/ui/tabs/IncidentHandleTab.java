@@ -46,7 +46,7 @@ public class IncidentHandleTab extends Tab {
 		VBox IncidentHandleContentVbox = new VBox();
 		Label IncidentHandleHeadingLabel = new Label("Report Incident");
 		Label InfoLabel = new Label(
-				"1. Select A civilian involved in incident \n2. Select securty company and/or community police involved");
+				"1. Select A civilian involved in incident \n2. Select securty company that responded to the civilian");
 		IncidentHandleHeadingLabel.setFont(Font.font("System", FontWeight.BOLD, 16));
 		InfoLabel.setFont(Font.font("System", FontWeight.BOLD, 16));
 
@@ -132,42 +132,42 @@ public class IncidentHandleTab extends Tab {
 		});
 
 		// getting list of objects from community police file
-		List<Object> comPopoObjects = HelperFunctions.readClassesFromFile(pathToReadCommunityPolice, CommunityPolice.class);
-		List<CommunityPolice> communityPolicies = new ArrayList<>();
+//		List<Object> comPopoObjects = HelperFunctions.readClassesFromFile(pathToReadCommunityPolice, CommunityPolice.class);
+//		List<CommunityPolice> communityPolicies = new ArrayList<>();
+//
+//		for (Object comPopoObj : comPopoObjects) {
+//			if (comPopoObj instanceof CommunityPolice) {
+//				communityPolicies.add((CommunityPolice) comPopoObj);
+//			}
+//		}
+//
+//		comPopoComboBox = new ComboBox<>();
+//		comPopoComboBox.getItems().addAll(communityPolicies);
+//
+//		comPopoComboBox.setCellFactory(param -> new ListCell<CommunityPolice>() {
+//			@Override
+//			protected void updateItem(CommunityPolice comPopo, boolean empty) {
+//				super.updateItem(comPopo, empty);
+//
+//				if (empty || comPopo == null) {
+//					setText(null);
+//				} else {
+//					setText(comPopo.getLocation());
+//				}
+//			}
+//		});
+//
+//		// Set text for security company combo box
+//		comPopoComboBox.setPromptText("Select Community Police");
+//
+//		// Set a listener to print the selected item whenever the value changes
+//		comPopoComboBox.valueProperty().addListener((observable, oldCom, newCom) -> {
+//			if (newCom != null) {
+//				communityPolice = newCom;
+//			}
+//		});
 
-		for (Object comPopoObj : comPopoObjects) {
-			if (comPopoObj instanceof CommunityPolice) {
-				communityPolicies.add((CommunityPolice) comPopoObj);
-			}
-		}
-
-		comPopoComboBox = new ComboBox<>();
-		comPopoComboBox.getItems().addAll(communityPolicies);
-
-		comPopoComboBox.setCellFactory(param -> new ListCell<CommunityPolice>() {
-			@Override
-			protected void updateItem(CommunityPolice comPopo, boolean empty) {
-				super.updateItem(comPopo, empty);
-
-				if (empty || comPopo == null) {
-					setText(null);
-				} else {
-					setText(comPopo.getLocation());
-				}
-			}
-		});
-
-		// Set text for security company combo box
-		comPopoComboBox.setPromptText("Select Community Police");
-
-		// Set a listener to print the selected item whenever the value changes
-		comPopoComboBox.valueProperty().addListener((observable, oldCom, newCom) -> {
-			if (newCom != null) {
-				communityPolice = newCom;
-			}
-		});
-
-		comboBoxes.getChildren().addAll(civilianComboBox, securityCompComboBox, comPopoComboBox);
+		comboBoxes.getChildren().addAll(civilianComboBox, securityCompComboBox);
 		comboBoxes.setSpacing(10);
 
 		// Labels and text areas to fill in details about the incident
@@ -198,7 +198,7 @@ public class IncidentHandleTab extends Tab {
 			}
 			if (communityPolice == null && securityCompany == null) {
 				Alert alert = new Alert(Alert.AlertType.WARNING,
-						"You need either a security guard or a community police for an incident");
+						"You need either a security guard to submit an incident");
 				alert.setTitle("Security or community police required");
 				alert.setHeaderText("No security or community police");
 				alert.showAndWait();
@@ -277,8 +277,8 @@ public class IncidentHandleTab extends Tab {
 			}
 		}
 
-		comPopoComboBox.getItems().clear();
-		comPopoComboBox.getItems().addAll(communityPolicies);
+//		comPopoComboBox.getItems().clear();
+//		comPopoComboBox.getItems().addAll(communityPolicies);
 		
 	}
 }

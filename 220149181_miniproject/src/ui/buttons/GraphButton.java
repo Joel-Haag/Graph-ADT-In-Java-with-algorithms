@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import com.jwetherell.algorithms.data_structures.Graph;
 import com.jwetherell.algorithms.data_structures.Graph.Edge;
@@ -135,13 +136,7 @@ public class GraphButton extends Button {
 
 					    Double[] coordsPrev = HelperFunctions.extractCoords(securityCompanies.get(i).getLocation());
 					    int securityWeight = (int) AlgorithmHelperFunctions.getDistance(coordsPrev, coords);
-					    if(graph.getVertices().get(i).getValue() instanceof SecurityCompany) {
-					        Edge<Individual> incidentEdge = new Edge<Individual>(securityWeight, securityCompany,
-					            graph.getVertices().get(i));
-
-					        graph.getEdges().add(incidentEdge);
-					    }
-			
+				
 
 						Line line = new Line();
 						// Set the line's color and width:
@@ -173,12 +168,7 @@ public class GraphButton extends Button {
 
 					        Double[] coordsPrev = HelperFunctions.extractCoords(securityCompanies.get(i).getLocation());
 					        int securityWeight = (int) AlgorithmHelperFunctions.getDistance(coordsPrev, coords);
-					        if(graph.getVertices().get(counter - 1).getValue() instanceof SecurityCompany) {
-					            Edge<Individual> incidentEdge = new Edge<Individual>(securityWeight, graph.getVertices().get(counter - 1),
-					                graph.getVertices().get(i));
-
-					            graph.getEdges().add(incidentEdge);
-					        }
+			
 
 					        Line line = new Line();
 					        // Set the line's color and width:
@@ -204,6 +194,21 @@ public class GraphButton extends Button {
 					    }
 					}
 				}
+			}
+		}
+		
+		List<Vertex<Individual>> securityVertices = graph.getVertices().stream()
+				.filter(v -> v.getValue() instanceof SecurityCompany).collect(Collectors.toList());
+
+		for (int i = 0; i < securityVertices.size(); i++) {
+			Vertex<Individual> fromVertex = securityVertices.get(i);
+			for (int j = i + 1; j < securityVertices.size(); j++) {
+				Vertex<Individual> toVertex = securityVertices.get(j);
+				Double[] coordsFrom = HelperFunctions.extractCoords(fromVertex.getValue().getLocation());
+				Double[] coordsTo = HelperFunctions.extractCoords(toVertex.getValue().getLocation());
+				int securityWeight = (int) AlgorithmHelperFunctions.getDistance(coordsFrom, coordsTo);
+				Edge<Individual> incidentEdge = new Edge<Individual>(securityWeight, fromVertex, toVertex);
+				graph.getEdges().add(incidentEdge);
 			}
 		}
 
@@ -238,136 +243,136 @@ public class GraphButton extends Button {
 		}
 
 		// getting all incidents saved, which will be the edges between the nodes
-		List<Object> incidentObjects = HelperFunctions.readClassesFromFile(pathToReadIncidents, Incident.class);
-		List<Incident> incidents = new ArrayList<>();
-		Double[] civilianCoords = null;
-		Double[] responderCoords = null;
-		Boolean foundEdge = false;
-		// adding community police as vertices to graph
-		for (Object incidentObj : incidentObjects) {
-			Vertex<Individual> v1 = null;
-			Vertex<Individual> v2 = null;
+//		List<Object> incidentObjects = HelperFunctions.readClassesFromFile(pathToReadIncidents, Incident.class);
+//		List<Incident> incidents = new ArrayList<>();
+//		Double[] civilianCoords = null;
+//		Double[] responderCoords = null;
+//		Boolean foundEdge = false;
+//		// adding community police as vertices to graph
+//		for (Object incidentObj : incidentObjects) {
+//			Vertex<Individual> v1 = null;
+//			Vertex<Individual> v2 = null;
+//
+//			if (incidentObj instanceof Incident) {
+//				incidents.add((Incident) incidentObj);
+//				if (((Incident) incidentObj).getSecurityCompany() != null) {
+//					if (((Incident) incidentObj).getCivilian() != null) {
+//						List<Vertex<Individual>> theVertices = graph.getVertices();
+//						for (Vertex<Individual> vertex : theVertices) {
+//							if (vertex.getValue().getId().equals(((Incident) incidentObj).getCivilian().getId())) {
+//								v1 = vertex;
+//								civilianCoords = HelperFunctions
+//										.extractCoords(((Incident) incidentObj).getCivilian().getLocation());
+//							}
+//							if (vertex.getValue().getId()
+//									.equals(((Incident) incidentObj).getSecurityCompany().getId())) {
+//								v2 = vertex;
+//								responderCoords = HelperFunctions
+//										.extractCoords(((Incident) incidentObj).getSecurityCompany().getLocation());
+//							}
+//						}
+//						int weight = AlgorithmHelperFunctions.getEdgeWeight(((Incident) incidentObj).getSeverity(),
+//								AlgorithmHelperFunctions.getDistance(civilianCoords, responderCoords));
+//						Edge<Individual> incidentEdge = new Edge<Individual>(weight, v1, v2);
+//						Line line = new Line();
+//						// Set the line's color and width:
+//						line.setStroke(Color.GREEN);
+//						line.setStrokeWidth(5);
+//						for (int i = 0; i < uuidArray.length; i++) {
+//							Circle node1 = null;
+//							Circle node2 = null;
+//							UUID uuid = uuidArray[i];
+//							if (((Incident) incidentObj).getCivilian().getId().equals(uuid)) {
+//								node1 = circleArray[i];
+//								line.setStartX(node1.getCenterX());
+//								line.setStartY(node1.getCenterY());
+//
+//							} else if (((Incident) incidentObj).getSecurityCompany().getId().equals(uuid)) {
+//								node2 = circleArray[i];
+//								line.setEndX(node2.getCenterX());
+//								line.setEndY(node2.getCenterY());
+//
+//							}
+//						}
+//						Label edgeWeightLabel = new Label(Integer.toString(weight));
+//						double centerX = (line.getStartX() + line.getEndX()) / 2;
+//						double centerY = (line.getStartY() + line.getEndY()) / 2;
+//						edgeWeightLabel.setLayoutX(centerX);
+//						edgeWeightLabel.setLayoutY(centerY);
+//						edgeWeightLabel.setTextFill(Color.YELLOW);
+//						nodeLabels.add(edgeWeightLabel);
+//						if (!pane.getChildren().contains(line)) {
+//							pane.getChildren().add(line);
+//						}
+//
+//					}
+//				} else {
+//					if (((Incident) incidentObj).getCommunityPolice() != null) {
+//						if (((Incident) incidentObj).getCivilian() != null) {
+//							List<Vertex<Individual>> theVertices = graph.getVertices();
+//							for (Vertex<Individual> vertex : theVertices) {
+//								if (vertex.getValue().getId().equals(((Incident) incidentObj).getCivilian().getId())) {
+//									v1 = vertex;
+//									civilianCoords = HelperFunctions
+//											.extractCoords(((Incident) incidentObj).getCivilian().getLocation());
+//								}
+//								if (vertex.getValue().getId()
+//										.equals(((Incident) incidentObj).getCommunityPolice().getId())) {
+//									v2 = vertex;
+//									responderCoords = HelperFunctions
+//											.extractCoords(((Incident) incidentObj).getCommunityPolice().getLocation());
+//								}
+//							}
+//							int weight = AlgorithmHelperFunctions.getEdgeWeight(((Incident) incidentObj).getSeverity(),
+//									AlgorithmHelperFunctions.getDistance(civilianCoords, responderCoords));
+//							Edge<Individual> incidentEdge = new Edge<Individual>(weight, v1, v2);
+//							Line line = new Line();
+//							// Set the line's color and width:
+//							line.setStroke(Color.GREEN);
+//							line.setStrokeWidth(5);
+//							for (int i = 0; i < uuidArray.length; i++) {
+//								Circle node1 = null;
+//								Circle node2 = null;
+//								UUID uuid = uuidArray[i];
+//								if (((Incident) incidentObj).getCivilian().getId().equals(uuid)) {
+//									node1 = circleArray[i];
+//									line.setStartX(node1.getCenterX());
+//									line.setStartY(node1.getCenterY());
+//
+//								} else if (((Incident) incidentObj).getCommunityPolice().getId().equals(uuid)) {
+//									node2 = circleArray[i];
+//									line.setEndX(node2.getCenterX());
+//									line.setEndY(node2.getCenterY());
+//
+//								}
+//							}
+//							Label edgeWeightLabel = new Label(Integer.toString(weight));
+//							double centerX = (line.getStartX() + line.getEndX()) / 2;
+//							double centerY = (line.getStartY() + line.getEndY()) / 2;
+//							edgeWeightLabel.setLayoutX(centerX);
+//							edgeWeightLabel.setLayoutY(centerY);
+//							edgeWeightLabel.setTextFill(Color.YELLOW);
+//							nodeLabels.add(edgeWeightLabel);
+//							if (!pane.getChildren().contains(line)) {
+//								pane.getChildren().add(line);
+//							}
+//						}
+//					}
+//				}
+//				if (v1 != null && v2 != null) {
+//					int weight = AlgorithmHelperFunctions.getEdgeWeight(((Incident) incidentObj).getSeverity(),
+//							AlgorithmHelperFunctions.getDistance(civilianCoords, responderCoords));
+//					Edge<Individual> incidentEdge = new Edge<Individual>(weight, v1, v2);
+//					graph.getEdges().add(incidentEdge);
+//					v1 = null;
+//					v2 = null;
+//				}
+//
+//			}
+//
+//		}
 
-			if (incidentObj instanceof Incident) {
-				incidents.add((Incident) incidentObj);
-				if (((Incident) incidentObj).getSecurityCompany() != null) {
-					if (((Incident) incidentObj).getCivilian() != null) {
-						List<Vertex<Individual>> theVertices = graph.getVertices();
-						for (Vertex<Individual> vertex : theVertices) {
-							if (vertex.getValue().getId().equals(((Incident) incidentObj).getCivilian().getId())) {
-								v1 = vertex;
-								civilianCoords = HelperFunctions
-										.extractCoords(((Incident) incidentObj).getCivilian().getLocation());
-							}
-							if (vertex.getValue().getId()
-									.equals(((Incident) incidentObj).getSecurityCompany().getId())) {
-								v2 = vertex;
-								responderCoords = HelperFunctions
-										.extractCoords(((Incident) incidentObj).getSecurityCompany().getLocation());
-							}
-						}
-						int weight = AlgorithmHelperFunctions.getEdgeWeight(((Incident) incidentObj).getSeverity(),
-								AlgorithmHelperFunctions.getDistance(civilianCoords, responderCoords));
-						Edge<Individual> incidentEdge = new Edge<Individual>(weight, v1, v2);
-						Line line = new Line();
-						// Set the line's color and width:
-						line.setStroke(Color.GREEN);
-						line.setStrokeWidth(5);
-						for (int i = 0; i < uuidArray.length; i++) {
-							Circle node1 = null;
-							Circle node2 = null;
-							UUID uuid = uuidArray[i];
-							if (((Incident) incidentObj).getCivilian().getId().equals(uuid)) {
-								node1 = circleArray[i];
-								line.setStartX(node1.getCenterX());
-								line.setStartY(node1.getCenterY());
-
-							} else if (((Incident) incidentObj).getSecurityCompany().getId().equals(uuid)) {
-								node2 = circleArray[i];
-								line.setEndX(node2.getCenterX());
-								line.setEndY(node2.getCenterY());
-
-							}
-						}
-						Label edgeWeightLabel = new Label(Integer.toString(weight));
-						double centerX = (line.getStartX() + line.getEndX()) / 2;
-						double centerY = (line.getStartY() + line.getEndY()) / 2;
-						edgeWeightLabel.setLayoutX(centerX);
-						edgeWeightLabel.setLayoutY(centerY);
-						edgeWeightLabel.setTextFill(Color.YELLOW);
-						nodeLabels.add(edgeWeightLabel);
-						if (!pane.getChildren().contains(line)) {
-							pane.getChildren().add(line);
-						}
-
-					}
-				} else {
-					if (((Incident) incidentObj).getCommunityPolice() != null) {
-						if (((Incident) incidentObj).getCivilian() != null) {
-							List<Vertex<Individual>> theVertices = graph.getVertices();
-							for (Vertex<Individual> vertex : theVertices) {
-								if (vertex.getValue().getId().equals(((Incident) incidentObj).getCivilian().getId())) {
-									v1 = vertex;
-									civilianCoords = HelperFunctions
-											.extractCoords(((Incident) incidentObj).getCivilian().getLocation());
-								}
-								if (vertex.getValue().getId()
-										.equals(((Incident) incidentObj).getCommunityPolice().getId())) {
-									v2 = vertex;
-									responderCoords = HelperFunctions
-											.extractCoords(((Incident) incidentObj).getCommunityPolice().getLocation());
-								}
-							}
-							int weight = AlgorithmHelperFunctions.getEdgeWeight(((Incident) incidentObj).getSeverity(),
-									AlgorithmHelperFunctions.getDistance(civilianCoords, responderCoords));
-							Edge<Individual> incidentEdge = new Edge<Individual>(weight, v1, v2);
-							Line line = new Line();
-							// Set the line's color and width:
-							line.setStroke(Color.GREEN);
-							line.setStrokeWidth(5);
-							for (int i = 0; i < uuidArray.length; i++) {
-								Circle node1 = null;
-								Circle node2 = null;
-								UUID uuid = uuidArray[i];
-								if (((Incident) incidentObj).getCivilian().getId().equals(uuid)) {
-									node1 = circleArray[i];
-									line.setStartX(node1.getCenterX());
-									line.setStartY(node1.getCenterY());
-
-								} else if (((Incident) incidentObj).getCommunityPolice().getId().equals(uuid)) {
-									node2 = circleArray[i];
-									line.setEndX(node2.getCenterX());
-									line.setEndY(node2.getCenterY());
-
-								}
-							}
-							Label edgeWeightLabel = new Label(Integer.toString(weight));
-							double centerX = (line.getStartX() + line.getEndX()) / 2;
-							double centerY = (line.getStartY() + line.getEndY()) / 2;
-							edgeWeightLabel.setLayoutX(centerX);
-							edgeWeightLabel.setLayoutY(centerY);
-							edgeWeightLabel.setTextFill(Color.YELLOW);
-							nodeLabels.add(edgeWeightLabel);
-							if (!pane.getChildren().contains(line)) {
-								pane.getChildren().add(line);
-							}
-						}
-					}
-				}
-				if (v1 != null && v2 != null) {
-					int weight = AlgorithmHelperFunctions.getEdgeWeight(((Incident) incidentObj).getSeverity(),
-							AlgorithmHelperFunctions.getDistance(civilianCoords, responderCoords));
-					Edge<Individual> incidentEdge = new Edge<Individual>(weight, v1, v2);
-					graph.getEdges().add(incidentEdge);
-					v1 = null;
-					v2 = null;
-				}
-
-			}
-
-		}
-
-		// adding the edges between community police and civilians
+		// adding the edges between community police and civilians and security companies
 		List<Vertex<Individual>> vertices = graph.getVertices();
 		Circle communityPoliceCircle = null;
 		Circle civilianCircle = null;
@@ -381,8 +386,12 @@ public class GraphButton extends Button {
 					// Set the line's color and width:
 					comCivLin.setStroke(Color.GREEN);
 					comCivLin.setStrokeWidth(5);
-					if (civilianVertix.getWeight() == 1) {
-						Edge<Individual> communityCivilian = new Edge<Individual>(2, communityPoliceVertix,
+					if (civilianVertix.getWeight() == 1 || civilianVertix.getWeight() == 2) {
+						Double[] communityPoliceCoords = HelperFunctions
+								.extractCoords(communityPoliceVertix.getValue().getLocation());
+						Double[] civCoords = HelperFunctions.extractCoords(civilianVertix.getValue().getLocation());
+						int civToCom = (int) AlgorithmHelperFunctions.getDistance(communityPoliceCoords, civCoords);
+						Edge<Individual> communityCivilian = new Edge<Individual>(civToCom, communityPoliceVertix,
 								civilianVertix);
 						graph.getEdges().add(communityCivilian);
 
