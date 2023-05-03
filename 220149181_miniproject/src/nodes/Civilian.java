@@ -80,15 +80,17 @@ public class Civilian implements Individual, Serializable {
 	/**
 	 * overriding the to string method, so when this class is displayed, it's
 	 * displayed using its location which is useful on the incident handling
+	 * 
 	 * @return civilian object with location display
 	 */
 	@Override
 	public String toString() {
 		return location;
 	}
-	
+
 	/**
 	 * function to return the civilians location
+	 * 
 	 * @return civilians location
 	 */
 	@Override
@@ -98,6 +100,7 @@ public class Civilian implements Individual, Serializable {
 
 	/**
 	 * function to return the civilians id
+	 * 
 	 * @return civilians id
 	 */
 	@Override

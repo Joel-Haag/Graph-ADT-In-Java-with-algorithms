@@ -3,10 +3,10 @@ package nodes;
 import java.util.UUID;
 
 /**
- * Individual  interface that all nodes will inherit
+ * Individual interface that all nodes will inherit
  */
-public interface Individual extends Comparable<Individual>{
-	
+public interface Individual extends Comparable<Individual> {
+
 	/**
 	 * function to return location of node
 	 */

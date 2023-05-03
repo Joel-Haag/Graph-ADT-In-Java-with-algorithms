@@ -27,11 +27,14 @@ public class SecurityCompany implements Individual, Serializable {
 	 * the Security Company price
 	 */
 	private Double price;
+
 	/**
-	 * The Security Company constructor which creates a new instance of a Security Company.
-	 * @param name the name of the Security Company .
+	 * The Security Company constructor which creates a new instance of a Security
+	 * Company.
+	 * 
+	 * @param name     the name of the Security Company .
 	 * @param location the location of the Security Company .
-	 * @param price the price of the Security Company.
+	 * @param price    the price of the Security Company.
 	 */
 	public SecurityCompany(String name, String location, double price) {
 		this.id = UUID.randomUUID();
@@ -43,6 +46,7 @@ public class SecurityCompany implements Individual, Serializable {
 
 	/**
 	 * function to return the Security Company name
+	 * 
 	 * @return Security Company name
 	 */
 	public String getName() {
@@ -51,6 +55,7 @@ public class SecurityCompany implements Individual, Serializable {
 
 	/**
 	 * function to return the Security Company price
+	 * 
 	 * @returnSecurity Company price
 	 */
 	public Double getPrice() {
@@ -59,6 +64,7 @@ public class SecurityCompany implements Individual, Serializable {
 
 	/**
 	 * function to return the Security Company location
+	 * 
 	 * @return Security Company location
 	 */
 	@Override
@@ -68,6 +74,7 @@ public class SecurityCompany implements Individual, Serializable {
 
 	/**
 	 * function to return the Security Company id
+	 * 
 	 * @return Security Company id
 	 */
 	@Override
@@ -76,7 +83,9 @@ public class SecurityCompany implements Individual, Serializable {
 	}
 
 	/**
-	 * function to return the Security Company instance of the class, which will display the location
+	 * function to return the Security Company instance of the class, which will
+	 * display the location
+	 * 
 	 * @return Security Company location
 	 */
 	@Override
@@ -89,6 +98,5 @@ public class SecurityCompany implements Individual, Serializable {
 		// TODO Auto-generated method stub
 		return 0;
 	}
-
 
 }

@@ -77,7 +77,8 @@ public class CommunityPolice implements Individual, Serializable {
 	}
 
 	/**
-	 * function to return the Community Police instance, displayed as it's location 
+	 * function to return the Community Police instance, displayed as it's location
+	 * 
 	 * @return Community Police location
 	 */
 	@Override
