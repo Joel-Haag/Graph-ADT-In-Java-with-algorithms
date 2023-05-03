@@ -5,10 +5,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -29,7 +27,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.util.Pair;
 import nodes.Civilian;
 import nodes.CommunityPolice;
 import nodes.Incident;
@@ -43,7 +40,6 @@ public class ShortestPathGraphButton extends Button {
 	private String pathToReadCivilian = "./data/Civilians.binary";
 	private String pathToReadSecurityCompany = "./data/SecurityCompany.binary";
 	private String pathToReadCommunityPolice = "./data/CommunityPolice.binary";
-	private String pathToReadIncidents = "./data/Incident.binary";
 	private Circle[] circleArray = new Circle[50];
 	private UUID[] uuidArray = new UUID[50];
 	private Integer row = 0;
@@ -146,10 +142,13 @@ public class ShortestPathGraphButton extends Button {
 				Double[] coordsFrom = HelperFunctions.extractCoords(fromVertex.getValue().getLocation());
 				Double[] coordsTo = HelperFunctions.extractCoords(toVertex.getValue().getLocation());
 				int securityWeight = (int) AlgorithmHelperFunctions.getDistance(coordsFrom, coordsTo);
-				Edge<Individual> incidentEdge = new Edge<Individual>(securityWeight, fromVertex, toVertex);
-				graph.getEdges().add(incidentEdge);
-				fromVertex.addEdge(incidentEdge);
-				toVertex.addEdge(incidentEdge);
+				if (securityWeight < 10) {
+					Edge<Individual> incidentEdge = new Edge<Individual>(securityWeight, fromVertex, toVertex);
+					graph.getEdges().add(incidentEdge);
+					fromVertex.addEdge(incidentEdge);
+					toVertex.addEdge(incidentEdge);
+				}
+
 			}
 		}
 
@@ -190,7 +189,6 @@ public class ShortestPathGraphButton extends Button {
 		for (Vertex<Individual> communityPoliceVertix : vertices) {
 			if (communityPoliceVertix.getWeight() == 3) {
 
-				Individual communityPolice = communityPoliceVertix.getValue();
 				for (Vertex<Individual> civilianVertix : vertices) {
 
 					// Set the line's color and width:
@@ -200,22 +198,17 @@ public class ShortestPathGraphButton extends Button {
 								.extractCoords(communityPoliceVertix.getValue().getLocation());
 						Double[] civCoords = HelperFunctions.extractCoords(civilianVertix.getValue().getLocation());
 						int civToCom = (int) AlgorithmHelperFunctions.getDistance(communityPoliceCoords, civCoords);
-						Edge<Individual> communityCivilian = new Edge<Individual>(civToCom, communityPoliceVertix,
-								civilianVertix);
-						graph.getEdges().add(communityCivilian);
-						communityPoliceVertix.addEdge(communityCivilian);
-						civilianVertix.addEdge(communityCivilian);
+						if (civToCom < 7) {
+							Edge<Individual> communityCivilian = new Edge<Individual>(civToCom, communityPoliceVertix,
+									civilianVertix);
+							graph.getEdges().add(communityCivilian);
+							communityPoliceVertix.addEdge(communityCivilian);
+							civilianVertix.addEdge(communityCivilian);
+						}
 
 					}
 
 				}
-			}
-		}
-
-		for (Label label : nodeLabels) {
-			label.setFont(Font.font("System", FontWeight.BOLD, 13));
-			if (!pane.getChildren().contains(label)) {
-				pane.getChildren().add(label);
 			}
 		}
 
@@ -246,11 +239,7 @@ public class ShortestPathGraphButton extends Button {
 			}
 		}
 
-		System.out.println(((SecurityCompany) securityCompany.getValue()).getName());
-		System.out.println(((Civilian) civilian.getValue()).getName());
-
 		List<Vertex<Individual>> path = dijkstraShortestPath(graph, securityCompany, civilian);
-		System.out.println(path);
 		Vertex<Individual> vertexFrom = null;
 		Vertex<Individual> vertexTo = null;
 		for (Vertex<Individual> ver : path) {
@@ -259,7 +248,7 @@ public class ShortestPathGraphButton extends Button {
 			line.setStroke(Color.GREEN);
 			line.setStrokeWidth(5);
 			vertexFrom = ver;
-			
+
 			if (vertexTo != null) {
 				Double[] vertixFromCoords = HelperFunctions.extractCoords(vertexFrom.getValue().getLocation());
 				Double[] vertixToCoords = HelperFunctions.extractCoords(vertexTo.getValue().getLocation());
@@ -312,14 +301,29 @@ public class ShortestPathGraphButton extends Button {
 						}
 					}
 				}
-				
-				
+
+				int weight = (int) AlgorithmHelperFunctions.getDistance(vertixFromCoords, vertixToCoords);
+				Label edgeWeightLabel = new Label(Integer.toString(weight));
+				double centerX = (line.getStartX() + line.getEndX()) / 2;
+				double centerY = (line.getStartY() + line.getEndY()) / 2;
+				edgeWeightLabel.setLayoutX(centerX);
+				edgeWeightLabel.setLayoutY(centerY);
+				edgeWeightLabel.setTextFill(Color.YELLOW);
+				nodeLabels.add(edgeWeightLabel);
+
 				if (!pane.getChildren().contains(line)) {
 					pane.getChildren().add(line);
 				}
 			}
 			vertexTo = ver;
 
+		}
+
+		for (Label label : nodeLabels) {
+			label.setFont(Font.font("System", FontWeight.BOLD, 13));
+			if (!pane.getChildren().contains(label)) {
+				pane.getChildren().add(label);
+			}
 		}
 
 		graphStage.showAndWait();
@@ -339,23 +343,23 @@ public class ShortestPathGraphButton extends Button {
 		Set<Vertex<Individual>> unvisitedNodes = new HashSet<>();
 
 		for (Vertex<Individual> v : graph.getVertices()) {
-			distMap.put(v, Double.POSITIVE_INFINITY);
-			unvisitedNodes.add(v);
+			if (v.getValue() instanceof Civilian && !v.getValue().getId().equals(target.getValue().getId())) {
+
+			} else {
+				distMap.put(v, Double.POSITIVE_INFINITY);
+				unvisitedNodes.add(v);
+			}
 		}
 
 		distMap.put(source, 0.0);
 
 		while (!unvisitedNodes.isEmpty()) {
-			// System.out.println("1");
 			Vertex<Individual> current = unvisitedNodes.stream().min(Comparator.comparingDouble(distMap::get)).get();
-			// System.out.println("2 " + current);
 			unvisitedNodes.remove(current);
 
 			if (current.equals(target)) {
 				break;
 			}
-
-			// System.out.println("the current Edge" + current.getEdges());
 
 			for (Edge<Individual> edge : current.getEdges()) {
 				// System.out.println("3 looping through edges" + edge);
