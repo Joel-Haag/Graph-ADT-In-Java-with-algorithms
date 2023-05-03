@@ -153,7 +153,7 @@ public class GraphButton extends Button {
 						edgeWeightLabel.setLayoutX(centerX);
 						edgeWeightLabel.setLayoutY(centerY);
 						edgeWeightLabel.setTextFill(Color.YELLOW);
-						if (securityWeight < 12) {
+						if (securityWeight < 10) {
 							nodeLabels.add(edgeWeightLabel);
 							if (!pane.getChildren().contains(line)) {
 								pane.getChildren().add(line);
@@ -186,7 +186,7 @@ public class GraphButton extends Button {
 							edgeWeightLabel.setLayoutX(centerX);
 							edgeWeightLabel.setLayoutY(centerY);
 							edgeWeightLabel.setTextFill(Color.RED);
-							if (securityWeight < 12) {
+							if (securityWeight < 10) {
 								nodeLabels.add(edgeWeightLabel);
 
 								if (!pane.getChildren().contains(line)) {
