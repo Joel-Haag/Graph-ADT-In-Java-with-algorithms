@@ -1,12 +1,21 @@
 package nodes.algorithms;
 
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
+/**
+ * 
+ * AlgorithmHelperFunctions a class which includes a few functions to help run
+ * my project
+ *
+ */
 public class AlgorithmHelperFunctions {
-	private List<Integer>[] adj;
 
+	/**
+	 * a function that returns the distance between any two locations
+	 * @param node1Coords the first locations coordinates in the format of [x, y]
+	 * @param node2Coords the second locations coordinates in the format of [x, y]
+	 * @return distance	the distance between the two nodes
+	 */
 	public static double getDistance(Double[] node1Coords, Double[] node2Coords) {
 		double x1 = node1Coords[0];
 		double y1 = node1Coords[1];
@@ -32,22 +41,6 @@ public class AlgorithmHelperFunctions {
 			return false;
 		}
 
-	}
-
-	public void bfs(int s, int numberOfNodes) {
-		boolean[] visited = new boolean[numberOfNodes];
-		Queue<Integer> queue = new LinkedList<>();
-		visited[s] = true;
-		queue.offer(s);
-		while (!queue.isEmpty()) {
-			int u = queue.poll();
-			for (int v : adj[u]) {
-				if (!visited[v]) {
-					visited[v] = true;
-					queue.offer(v);
-				}
-			}
-		}
 	}
 
 }
