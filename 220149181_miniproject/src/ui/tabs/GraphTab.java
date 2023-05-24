@@ -64,10 +64,8 @@ public class GraphTab extends Tab {
 			}
 		});
 
-		// Set text for civilian combo box
 		incidentComboBox.setPromptText("Select Incident");
 
-		// Set a listener to print the selected item whenever the value changes
 		incidentComboBox.valueProperty().addListener((observable, oldInc, newInc) -> {
 			if (newInc != null) {
 				incident = newInc;
@@ -84,10 +82,10 @@ public class GraphTab extends Tab {
 		graphTabContentVbox.setSpacing(20);
 		graphTabContentVbox.setPadding(new Insets(20));
 
-		showGraphButton.setOnAction(e -> showGraphButton.createGraph()); // add an action to the button
-		showMSTGraphButton.setOnAction(e -> showMSTGraphButton.createGraph()); // add an action to the button
-		showShortestPathGraphButton.setOnAction(e -> showShortestPathGraphButton.createGraph(incident)); // add an action to the
-																									// button
+		showGraphButton.setOnAction(e -> showGraphButton.createGraph());
+		showMSTGraphButton.setOnAction(e -> showMSTGraphButton.createGraph());
+		showShortestPathGraphButton.setOnAction(e -> showShortestPathGraphButton.createGraph(incident));
+																								
 
 		setContent(graphTabContentVbox);
 

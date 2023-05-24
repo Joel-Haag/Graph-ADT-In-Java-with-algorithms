@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -338,10 +339,22 @@ public class ShortestPathGraphButton extends Button {
 
 	public List<Vertex<Individual>> dijkstraShortestPath(Graph<Individual> graph, Vertex<Individual> source,
 			Vertex<Individual> target) {
+		//maps holding the previous and distances for the vertices
 		Map<Vertex<Individual>, Vertex<Individual>> prevMap = new HashMap<>();
 		Map<Vertex<Individual>, Double> distMap = new HashMap<>();
-		Set<Vertex<Individual>> unvisitedNodes = new HashSet<>();
+		//comparing the vertices based on distance
+		Comparator<Vertex<Individual>> distComparator = new Comparator<Vertex<Individual>>() {
+		    public int compare(Vertex<Individual> v1, Vertex<Individual> v2) {
+		        double dist1 = distMap.get(v1);
+		        double dist2 = distMap.get(v2);
+		        return Double.compare(dist1, dist2);
+		    }
+		};
 
+		//pq holding univisted nodes, using the comparator
+		PriorityQueue<Vertex<Individual>> unvisitedNodes = new PriorityQueue<>(distComparator);
+
+		//looping through vertices to initialize them with infinity and add them to univisted nodes pq
 		for (Vertex<Individual> v : graph.getVertices()) {
 			if (v.getValue() instanceof Civilian && !v.getValue().getId().equals(target.getValue().getId())) {
 
@@ -351,12 +364,24 @@ public class ShortestPathGraphButton extends Button {
 			}
 		}
 
+		//making the distance of the source vertex = 0
 		distMap.put(source, 0.0);
 
+		//loop through all vertices
 		while (!unvisitedNodes.isEmpty()) {
-			Vertex<Individual> current = unvisitedNodes.stream().min(Comparator.comparingDouble(distMap::get)).get();
+			Vertex<Individual> current = null;
+			double minDist = Double.MAX_VALUE;
+			//finding the vertix with the minimal distance
+			for (Vertex<Individual> node : unvisitedNodes) {
+			    double dist = distMap.get(node);
+			    if (dist < minDist) {
+			        minDist = dist;
+			        current = node;
+			    }
+			}
 			unvisitedNodes.remove(current);
 
+			//when dest node been reached break
 			if (current.equals(target)) {
 				break;
 			}
@@ -370,17 +395,15 @@ public class ShortestPathGraphButton extends Button {
 					neighbor = edge.getFromVertex();
 				}
 
-				// Continue only if the neighbor has not been visited yet
+				// Continue if the neighbor has not been visited 
 				if (!unvisitedNodes.contains(neighbor)) {
 					continue;
 				}
-
-				// Calculate the cost of traveling from the current vertex to the neighbor
+				// calc cost from current to neightbor vertex
 				System.out.println(current);
 				double alt = distMap.get(current) + edge.getCost();
-
-				// Update the distance and predecessor maps if the cost is lower than the
-				// current best
+				
+				// if predecessor map cost is lower the the best, make predecesser new best
 				if (alt < distMap.get(neighbor)) {
 					distMap.put(neighbor, alt);
 					prevMap.put(neighbor, current);
@@ -388,7 +411,7 @@ public class ShortestPathGraphButton extends Button {
 			}
 
 		}
-
+		// create the path, by going over dest vertex to source vertex
 		List<Vertex<Individual>> path = new ArrayList<>();
 		Vertex<Individual> current = target;
 		while (prevMap.containsKey(current)) {
@@ -396,7 +419,6 @@ public class ShortestPathGraphButton extends Button {
 			current = prevMap.get(current);
 		}
 		path.add(current);
-		// path = Lists.reverse(path);
 		return path;
 	}
 

@@ -53,12 +53,8 @@ public class IncidentHandleTab extends Tab {
 		IncidentHandleContentVbox.setAlignment(Pos.TOP_CENTER);
 		IncidentHandleContentVbox.setSpacing(30);
 		Label savedIncidentCorrectlyLabel = new Label("");
-		// FIRST GETTING ALL PARTIES INVOLVED BY USING COMBO BOXES WHICH USER CAN SELECT
-		// FROM
-		// Horizontal box to store all the select combo boxes
 		HBox comboBoxes = new HBox();
 
-		// getting list of objects from civilian file
 		List<Object> civilianObjects = HelperFunctions.readClassesFromFile(pathToReadCivilian, Civilian.class);
 		List<Civilian> civilians = new ArrayList<>();
 
@@ -84,18 +80,15 @@ public class IncidentHandleTab extends Tab {
 			}
 		});
 
-		// Set text for civilian combo box
 		civilianComboBox.setPromptText("Select Cilivian");
 
-		// Set a listener to print the selected item whenever the value changes
 		civilianComboBox.valueProperty().addListener((observable, oldCiv, newCiv) -> {
 			if (newCiv != null) {
 				civilian = newCiv;
 			}
 		});
 
-		// Getting the civilian data from the civilian text file and adding each one to
-		// getting list of objects from civilian file
+
 		List<Object> securityCompObjects = HelperFunctions.readClassesFromFile(pathToReadSecurityCompany, SecurityCompany.class);
 		List<SecurityCompany> securityCompanies = new ArrayList<>();
 
@@ -121,56 +114,18 @@ public class IncidentHandleTab extends Tab {
 			}
 		});
 
-		// Set text for security company combo box
 		securityCompComboBox.setPromptText("Select Security Company");
 
-		// Set a listener to print the selected item whenever the value changes
 		securityCompComboBox.valueProperty().addListener((observable, oldSec, newSec) -> {
 			if (newSec != null) {
 				securityCompany = newSec;
 			}
 		});
 
-		// getting list of objects from community police file
-//		List<Object> comPopoObjects = HelperFunctions.readClassesFromFile(pathToReadCommunityPolice, CommunityPolice.class);
-//		List<CommunityPolice> communityPolicies = new ArrayList<>();
-//
-//		for (Object comPopoObj : comPopoObjects) {
-//			if (comPopoObj instanceof CommunityPolice) {
-//				communityPolicies.add((CommunityPolice) comPopoObj);
-//			}
-//		}
-//
-//		comPopoComboBox = new ComboBox<>();
-//		comPopoComboBox.getItems().addAll(communityPolicies);
-//
-//		comPopoComboBox.setCellFactory(param -> new ListCell<CommunityPolice>() {
-//			@Override
-//			protected void updateItem(CommunityPolice comPopo, boolean empty) {
-//				super.updateItem(comPopo, empty);
-//
-//				if (empty || comPopo == null) {
-//					setText(null);
-//				} else {
-//					setText(comPopo.getLocation());
-//				}
-//			}
-//		});
-//
-//		// Set text for security company combo box
-//		comPopoComboBox.setPromptText("Select Community Police");
-//
-//		// Set a listener to print the selected item whenever the value changes
-//		comPopoComboBox.valueProperty().addListener((observable, oldCom, newCom) -> {
-//			if (newCom != null) {
-//				communityPolice = newCom;
-//			}
-//		});
 
 		comboBoxes.getChildren().addAll(civilianComboBox, securityCompComboBox);
 		comboBoxes.setSpacing(10);
 
-		// Labels and text areas to fill in details about the incident
 		Label severityLabel = new Label("Severity: (1-10)");
 		severityLabel.setFont(Font.font("System", FontWeight.BOLD, 15));
 		TextField severityTextField = new TextField();
@@ -277,8 +232,6 @@ public class IncidentHandleTab extends Tab {
 			}
 		}
 
-//		comPopoComboBox.getItems().clear();
-//		comPopoComboBox.getItems().addAll(communityPolicies);
 		
 	}
 }

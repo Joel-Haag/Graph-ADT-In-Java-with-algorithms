@@ -325,39 +325,57 @@ public class MinimumSpanningTreeGraphButton extends Button {
 
 	// function to return edges of minimal spanning tree using kruskal algorithm
 	private List<Edge<Individual>> KruskalAlgorithm(List<Edge<Individual>> edges, List<Vertex<Individual>> vertices) {
+		//creating a new List of edges which will be the minimal spanning tree edges
 		List<Edge<Individual>> minimalSpanningTreeEdges = new ArrayList<>();
+		//an array which will keep track of the parent in each vertex
 		parent = new int[vertices.size()];
+		//an array which keeps track of every rank of every vertex
 		rank = new int[vertices.size()];
+		
+		//making the parent of every vertex itself
 		for (int i = 0; i < vertices.size(); i++) {
 			parent[i] = i;
 			rank[i] = 0;
 		}
+		//using Collections.sort to sort edges in ascending order
 		Collections.sort(edges);
+		//looping over the edges
 		for (Edge<Individual> edge : edges) {
+			//get the parent of the source / dest verts on current iteration edge
 			int firstIndex = findParent(getIndex(vertices, edge.getFromVertex()));
 			int secondIndex = findParent(getIndex(vertices, edge.getToVertex()));
+			//two different parents = different tree, so merge trees
 			if (firstIndex != secondIndex) {
 				minimalSpanningTreeEdges.add(edge);
+				//merging trees, root of smaller tree becomes root of larger tree
 				mergeTrees(firstIndex, secondIndex);
 			}
 		}
+	
 		return minimalSpanningTreeEdges;
 
 	}
 
+	//helper function that gets the parent of a vertex
 	private int findParent(int index) {
+		//making sure parent of vertex isn't itself
 		if (parent[index] != index) {
+			//Recursively look for vertex parent and make the parent the root
 			parent[index] = findParent(parent[index]);
 		}
 		return parent[index];
 	}
 
+	//helper function that merges the trees according to the larger rank
 	private void mergeTrees(int indexOne, int indexTwo) {
+		//getting root of both trees
 		int firstNode = findParent(indexOne);
 		int secondNode = findParent(indexTwo);
+		//checking if the trees are already merges (same root)
 		if (firstNode == secondNode) {
 			return;
 		}
+		//make root of smaller tree a child of the larger trees root
 		if (rank[firstNode] > rank[secondNode]) {
 			parent[secondNode] = firstNode;
 		} else if (rank[firstNode] < rank[secondNode]) {
@@ -368,8 +386,11 @@ public class MinimumSpanningTreeGraphButton extends Button {
 		}
 	}
 
+	//helper method that  finds the index of a certain vertex in the list of vertices
 	private <T> int getIndex(List<Vertex<Individual>> vertices, Vertex<Individual> v) {
+		//looping through vertices
 		for (int i = 0; i < vertices.size(); i++) {
+			//checking if they equal by their id
 			if (vertices.get(i).getValue().getId().equals(v.getValue().getId())) {
 				return i;
 			}

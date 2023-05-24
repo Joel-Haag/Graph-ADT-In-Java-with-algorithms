@@ -51,21 +51,18 @@ public class HelperFunctions {
 			fos.close();
 
 			return true;
-		} // Catch block to handle the exceptions
+		} 
 		catch (Exception e) {
-			// Print the exception along with the
-			// display message
-			System.out.println("Error Occurred" + e);
+
+			System.out.println(e);
 			return false;
 		}
 	}
 
 	public static List<Object> readClassesFromFile(String pathToRead, Class<?> className) {
 		File f = new File(pathToRead);
-		// Try block to check for exceptions
 		try {
 
-			// Creating new file using File object above
 			f.createNewFile();
 		}
 
@@ -239,27 +236,23 @@ public class HelperFunctions {
 	}
 	
 	public static Double[] extractCoords(String input) {
-	    // Define a regular expression that matches two doubles separated by a colon
 	    String regex = "(\\d+(\\.\\d+)?):(\\d+(\\.\\d+)?)";
 
-	    // Create a pattern object from the regular expression
 	    Pattern pattern = Pattern.compile(regex);
 
-	    // Create a matcher object to search for the pattern in the input string
 	    Matcher matcher = pattern.matcher(input);
 
-	    // If a match is found, extract the two doubles and return them as a double array
 	    if (matcher.find()) {
 	        try {
 	            double firstDouble = Double.parseDouble(matcher.group(1));
 	            double secondDouble = Double.parseDouble(matcher.group(3));
 	            return new Double[]{firstDouble, secondDouble};
 	        } catch (NumberFormatException e) {
-	            System.err.println("Error: Unable to parse double from input string.");
+	            System.err.println(e);
 	            return null;
 	        }
 	    } else {
-	        System.err.println("Error: Input string does not match expected format.");
+	        System.err.println("Error");
 	        return null;
 	    }
 	}
