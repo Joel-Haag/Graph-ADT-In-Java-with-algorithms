@@ -1,1 +1,6 @@
+Safety within a community.
+Safety is a huge issue in South Africa, with violent crimes being committed everyday and people unable to receive help in time, either due to not being able to afford a security company, or the fact that police can take hours to arrive after a call.
+The core solution to this, will be to connect people to their community police or any community police in a viable distance, and connect security companies to each other and to the community police in a viable distance.
+This will help connect citizens to the nearest viable security company and community police, even if their own security company is not available. This will include having algorithms to determine the fastest way for someone to reach a civilian which will improve reaction times and best connecting the community in a way that will make sure each civilian is connected strategically to every community police and security company.
+
 
